@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player Demo</title>
+    <link rel="stylesheet" href="music-player.css">
+    <script src="./music-player.js" defer></script>
+</head>
+<body>
+    <div class="header">
+        <button id="selectFolder">选择文件夹</button>
+        <div id="status"></div>
+    </div>
+    
+    <div class="main-content">
+        <div id="output">请点击上方按钮选择一个文件夹...</div>
+        <div id="player">
+            <h3>正在播放</h3>
+            <audio id="audioPlayer" controls></audio>
+            <div id="nowPlaying"></div>
+            <h4>歌词</h4>
+            <div id="lyrics"></div>
+        </div>
+    </div>
+
+</body>
+</html>

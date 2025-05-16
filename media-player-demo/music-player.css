@@ -1,0 +1,303 @@
+#output * {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+* {
+    box-sizing: border-box;
+}
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    line-height: 1.6;
+    overflow: hidden;
+    min-height: 100vh;
+}
+
+/* 头部控制区域 */
+.header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    width: 90%;
+    margin-left: 5%;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+button {
+    padding: 10px 15px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    height: 40px;
+    flex-shrink: 0;
+    line-height: 100%;
+    word-break: keep-all;
+}
+button:hover {
+    background-color: #45a049;
+}
+
+/* 状态栏 */
+#status {
+    flex: 1;
+    min-width: 0;
+    height: 40px;
+    line-height: 40px;
+    padding: 0 15px;
+    border-radius: 4px;
+    background-color: #fff3cd;
+    white-space: nowrap;
+    overflow: hidden;
+    position: relative;
+    text-overflow: ellipsis;
+}
+#status.marquee {
+    text-overflow: clip;
+}
+#status.marquee span {
+    display: inline-block;
+    padding-left: 100%;
+    animation: marquee 15s linear infinite;
+}
+@keyframes marquee {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-100%); }
+}
+
+/* 主内容区域 */
+.main-content {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    height: calc(100vh - 100px);
+}
+@media (min-width: 768px) {
+    .main-content {
+        flex-direction: row;
+        align-items: flex-start;
+        justify-content: center;
+    }
+}
+
+/* 输出区域 */
+#output {
+    flex: 1;
+    min-width: 0;
+    padding: 0 10px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    height: 100%;
+    overflow-y: auto;
+    box-sizing: border-box;
+}
+#output > h2 {
+    position: -webkit-sticky;
+    position: sticky;
+    top: 0;
+    background-color: #f9f9f9;
+    z-index: 1;
+    margin: 0;
+    padding: 15px 0;
+}
+@media (min-width: 768px) {
+    #output {
+        flex: 0 1 50%;
+        max-width: 50%;
+    }
+}
+
+/* 播放器区域 */
+#player {
+    display: none;
+    flex: 1;
+    min-width: 0;
+    padding: 15px;
+    background-color: #f0f7ff;
+    border-radius: 5px;
+    border: 1px solid #cce0ff;
+    height: 100%;
+    overflow-y: auto;
+}
+@media (min-width: 768px) {
+    #player {
+        flex: 0 1 40%;
+        max-width: 40%;
+        margin-left: 20px;
+    }
+}
+#player audio {
+    width: 100%;
+    margin-bottom: 10px;
+}
+#lyrics {
+    max-height: calc(100% - 280px);
+    overflow-y: auto;
+    padding: 10px;
+    background-color: white;
+    border-radius: 3px;
+    border: 1px solid #ddd;
+    white-space: pre-wrap;
+    font-family: monospace;
+}
+
+.lyric-line {
+    margin: 5px 0;
+    animation-duration: .2s;
+    transition-duration: .2s;
+    animation-timing-function: linear;
+    transition-timing-function: linear;
+    font-size: 14px;
+    text-align: center;
+}
+.lyric-line.current {
+    color: #0066cc;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* 文件夹样式 */
+.dir {
+    list-style-type: none;
+    position: relative;
+    padding-left: 20px;
+    margin: 5px 0;
+}
+.dir::before {
+    content: "📁";
+    position: absolute;
+    left: 0;
+}
+.dir > .dir-name {
+    font-weight: bold;
+    cursor: pointer;
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+.dir > .dir-name:hover {
+    background-color: #f0f0f0;
+}
+.dir > ul {
+    padding-left: 5px;
+    margin-left: 10px;
+    border-left: 1px dashed #ccc;
+    display: none;
+}
+.dir.expanded > ul {
+    display: block;
+}
+.dir.expanded::before {
+    content: "📂";
+}
+
+/* 文件样式 */
+.file {
+    list-style-type: none;
+    position: relative;
+    margin: 3px 0;
+    cursor: pointer;
+    padding: 2px 5px;
+    padding-left: 1.3em;
+    border-radius: 3px;
+}
+.file:hover {
+    background-color: #f0f0f0;
+}
+.file::before {
+    content: "📄";
+    position: absolute;
+    left: 0;
+}
+
+/* 音乐文件样式 */
+.music {
+    list-style-type: none;
+    position: relative;
+    cursor: pointer;
+    padding: 2px 5px;
+    padding-left: 1.3em;
+    border-radius: 3px;
+}
+.music:hover {
+    background-color: #e6f7ff;
+}
+.music::before {
+    content: "🎵";
+    position: absolute;
+    left: 0;
+}
+.music.playing::before {
+    content: "🎶";
+}
+.music.playing {
+    background-color: #d4edff;
+    font-weight: bold;
+    animation: flash-text 4.5s linear infinite alternate;
+}
+
+@keyframes flash-text {
+    0% {
+        color: #FF00FF ;
+    }
+    100% {
+        color: #00FFFF ;
+    }
+}
+
+/* 文本文件样式 */
+.text {
+    list-style-type: none;
+    position: relative;
+    padding-left: 1.3em;
+    cursor: pointer;
+}
+.text::before {
+    content: "📝";
+    position: absolute;
+    left: 0;
+}
+
+/* 图片文件样式 */
+.image {
+    list-style-type: none;
+    position: relative;
+    padding-left: 1.3em;
+    cursor: pointer;
+}
+.image::before {
+    content: "🖼️";
+    position: absolute;
+    left: 0;
+}
+
+/* 压缩文件样式 */
+.archive {
+    list-style-type: none;
+    position: relative;
+    padding-left: 1.3em;
+    cursor: pointer;
+}
+.archive::before {
+    content: "🗜️";
+    position: absolute;
+    left: 0;
+}
+
+/* 可执行文件样式 */
+.executable {
+    list-style-type: none;
+    position: relative;
+    padding-left: 1.3em;
+    cursor: pointer;
+}
+.executable::before {
+    content: "⚙️";
+    position: absolute;
+    left: 0;
+}

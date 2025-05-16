@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="cmn-hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        :root {
+            padding: 20px;
+        }
+        @keyframes line-in {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+        svg {
+            margin: 10px;
+            border: #999 1px solid;
+            box-sizing: border-box;
+        }
+        svg:hover .path {
+            stroke-dasharray: var(--l), var(--l);
+            stroke-dashoffset: var(--l);
+            animation: line-in .8s linear forwards;
+        }
+        svg:hover {
+            border: #666 3px solid;
+        }
+    
+    </style>
+</head>
+<body>
+    <svg width="200" height="200" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet" stroke-width="2px" fill="none">
+        <circle class="path" cx="100" cy="100" r="40" stroke="#000"/>
+        <path class="path" d="M100 100 L160 100" stroke="#111"></path>
+        <path class="path" d="M100 100 L100 160" stroke="#111"></path>
+        <path class="path" d="M100 100 L100 40" stroke="#111"></path>
+        <path class="path" d="M100 100 L40 100" stroke="#111"></path>
+    </svg>
+
+    <svg width="200" height="200" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet" 
+         fill="none" stroke-width="6px" stroke="#000">
+        <path class="path" d="M100 35 L160 65 L100 95 L40 65 Z" stroke-linecap="round"></path>
+        <path class="path" d="M40 95 L100 125 L160 95" stroke-linecap="square"></path>
+        <path class="path" d="M160 125 L100 155 L40 125" stroke-linecap="square"></path>
+    </svg>
+
+    <svg width="200" height="200" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet" 
+         fill="none" stroke-width="5px" stroke="#000">
+        <path class="path" d="M100 50 A50 50 0 0 1 140 130" stroke-linecap="round"></path>
+        <path class="path" d="M140 130 A50 50 0 0 1 60 130" stroke-linecap="round"></path>
+        <path class="path" d="M60 130 A50 50 0 0 1 100 50" stroke-linecap="round"></path>
+        <path class="path" d="M85 120 L85 80" stroke-linecap="round" stroke-linejoin="round"></path>
+        <path class="path" d="M85 80 L120 100" stroke-linecap="round" stroke-linejoin="round"></path>  
+        <path class="path" d="M120 100 L85 120" stroke-linecap="round" stroke-linejoin="round"></path>
+    </svg> 
+    
+    <svg width="200" height="200" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet" 
+         fill="none" stroke-width="5px" stroke="#000">
+        <path class="path" d="M120 60 H75 C50 60 50 60 50 85 V115 C50 140 50 140 75 140 H90 L80 155" stroke-linecap="round"></path>
+        <path class="path" d="M150 90 V115 C150 140 150 140 125 140 H110 L80 155" stroke-linecap="round"></path>
+        <path class="path" d="M136 60 H164 M150 46 V74" stroke-linecap="round"></path>
+    </svg>
+
+    <svg width="200" height="200" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet" 
+         fill="none" stroke-width="5px" stroke="#000">
+        <path class="path" d="M124 24 V176" stroke-linecap="round"></path>
+        <path class="path" d="M124 176 L36 53" stroke-linecap="round"></path>
+        <path class="path" d="M36 53 L180 100" stroke-linecap="round"></path>
+        <path class="path" d="M180 100 L36 147" stroke-linecap="round"></path>
+        <path class="path" d="M36 147 L124 24" stroke-linecap="round"></path>
+    </svg>
+
+    <svg width="200" height="200" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet" 
+         fill="none" stroke-width="5px" stroke="#000">
+        <path class="path" d="M100 20 L53 164 176 76 24 76 147 164 Z" stroke-linecap="round"></path>
+    </svg>
+
+    <svg width="200" height="200" viewBox="0 0 200 200" preserveAspectRatio="xMidYMid meet" 
+          fill="none" stroke-width="5px" stroke="red">
+        <path class="path" d="M65 40 L170 100"></path>
+        <path class="path" d="M170 100 L65 160"></path>
+        <path class="path" d="M65 160 L65 40"></path>
+        <path class="path" d="M135 40 L135 160"></path>
+        <path class="path" d="M135 160 L30 100"></path>
+        <path class="path" d="M30 100 L135 40"></path>
+
+        <path class="path" d="M100 60 L135 120"></path>
+        <path class="path" d="M135 120 L65 120"></path>
+        <path class="path" d="M65 120 L100 60"></path>
+        <path class="path" d="M135 80 L100 140"></path>
+        <path class="path" d="M100 140 L65 80"></path>
+        <path class="path" d="M65 80 L135 80"></path>
+
+        <path class="path" d="M65 40 A70 70 0 0 1 135 40"></path>
+        <path class="path" d="M135 40 A70 70 0 0 1 170 100"></path>
+        <path class="path" d="M170 100 A70 70 0 0 1 135 160"></path>
+        <path class="path" d="M135 160 A70 70 0 0 1 65 160"></path>
+        <path class="path" d="M65 160 A70 70 0 0 1 30 100"></path>
+        <path class="path" d="M30 100 A70 70 0 0 1 65 40"></path>
+    </svg>
+
+    <script>
+        var path = document.getElementsByClassName("path");
+        for (let i = 0; i < path.length; i++) {
+            let len = path[i].getTotalLength();
+            path[i].style.setProperty("--l", Math.floor(len) + 1)
+        }
+    </script>
+</body>
+</html>

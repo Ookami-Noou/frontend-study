@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Player Demo</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        #output * {
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+            overflow: hidden;
+            min-height: 100vh;
+        }
+
+        /* 头部控制区域 */
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            width: 90%;
+            margin-left: 5%;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            height: 40px;
+            flex-shrink: 0;
+            line-height: 100%;
+            word-break: keep-all;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+
+        /* 状态栏 */
+        #status {
+            flex: 1;
+            min-width: 0;
+            height: 40px;
+            line-height: 40px;
+            padding: 0 15px;
+            border-radius: 4px;
+            background-color: #fff3cd;
+            white-space: nowrap;
+            overflow: hidden;
+            position: relative;
+            text-overflow: ellipsis;
+        }
+        #status.marquee {
+            text-overflow: clip;
+        }
+        #status.marquee span {
+            display: inline-block;
+            padding-left: 100%;
+            animation: marquee 15s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* 主内容区域 */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: calc(100vh - 100px);
+        }
+        @media (min-width: 768px) {
+            .main-content {
+                flex-direction: row;
+                align-items: flex-start;
+                justify-content: center;
+            }
+        }
+
+        /* 输出区域 */
+        #output {
+            flex: 1;
+            min-width: 0;
+            padding: 0 10px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            height: 100%;
+            overflow-y: auto;
+            box-sizing: border-box;
+        }
+        #output > h2 {
+            position: -webkit-sticky;
+            position: sticky;
+            top: 0;
+            background-color: #f9f9f9;
+            z-index: 1;
+            margin: 0;
+            padding: 15px 0;
+        }
+        @media (min-width: 768px) {
+            #output {
+                flex: 0 1 50%;
+                max-width: 50%;
+            }
+        }
+
+        /* 播放器区域 */
+        #player {
+            display: none;
+            flex: 1;
+            min-width: 0;
+            padding: 15px;
+            background-color: #f0f7ff;
+            border-radius: 5px;
+            border: 1px solid #cce0ff;
+            height: 100%;
+            overflow-y: auto;
+        }
+        @media (min-width: 768px) {
+            #player {
+                flex: 0 1 40%;
+                max-width: 40%;
+                margin-left: 20px;
+            }
+        }
+        #player audio {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        #lyrics {
+            max-height: calc(100% - 300px);
+            overflow-y: auto;
+            padding: 10px;
+            background-color: white;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+
+        .lyric-line {
+            margin: 5px 0;
+            animation-duration: .2s;
+            transition-duration: .2s;
+            animation-timing-function: linear;
+            transition-timing-function: linear;
+            font-size: 14px;
+            text-align: center;
+        }
+        .lyric-line.current {
+            color: #0066cc;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        /* 文件夹样式 */
+        .dir {
+            list-style-type: none;
+            position: relative;
+            padding-left: 20px;
+            margin: 5px 0;
+        }
+        .dir::before {
+            content: "📁";
+            position: absolute;
+            left: 0;
+        }
+        .dir > .dir-name {
+            font-weight: bold;
+            cursor: pointer;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+        .dir > .dir-name:hover {
+            background-color: #f0f0f0;
+        }
+        .dir > ul {
+            padding-left: 5px;
+            margin-left: 10px;
+            border-left: 1px dashed #ccc;
+            display: none;
+        }
+        .dir.expanded > ul {
+            display: block;
+        }
+        .dir.expanded::before {
+            content: "📂";
+        }
+
+        /* 文件样式 */
+        .file {
+            list-style-type: none;
+            position: relative;
+            margin: 3px 0;
+            cursor: pointer;
+            padding: 2px 5px;
+            padding-left: 1.3em;
+            border-radius: 3px;
+        }
+        .file:hover {
+            background-color: #f0f0f0;
+        }
+        .file::before {
+            content: "📄";
+            position: absolute;
+            left: 0;
+        }
+
+        /* 音乐文件样式 */
+        .music {
+            list-style-type: none;
+            position: relative;
+            cursor: pointer;
+            padding: 2px 5px;
+            padding-left: 1.3em;
+            border-radius: 3px;
+        }
+        .music:hover {
+            background-color: #e6f7ff;
+        }
+        .music::before {
+            content: "🎵";
+            position: absolute;
+            left: 0;
+        }
+        .music.playing::before {
+            content: "🎶";
+        }
+        .music.playing {
+            background-color: #d4edff;
+            font-weight: bold;
+            animation: flash-text 4.5s linear infinite alternate;
+        }
+
+        @keyframes flash-text {
+            0% {
+                color: #FF00FF ;
+            }
+            100% {
+                color: #00FFFF ;
+            }
+        }
+
+        /* 文本文件样式 */
+        .text {
+            list-style-type: none;
+            position: relative;
+            padding-left: 1.3em;
+            cursor: pointer;
+        }
+        .text::before {
+            content: "📝";
+            position: absolute;
+            left: 0;
+        }
+
+        /* 图片文件样式 */
+        .image {
+            list-style-type: none;
+            position: relative;
+            padding-left: 1.3em;
+            cursor: pointer;
+        }
+        .image::before {
+            content: "🖼️";
+            position: absolute;
+            left: 0;
+        }
+
+        /* 压缩文件样式 */
+        .archive {
+            list-style-type: none;
+            position: relative;
+            padding-left: 1.3em;
+            cursor: pointer;
+        }
+        .archive::before {
+            content: "🗜️";
+            position: absolute;
+            left: 0;
+        }
+
+        /* 可执行文件样式 */
+        .executable {
+            list-style-type: none;
+            position: relative;
+            padding-left: 1.3em;
+            cursor: pointer;
+        }
+        .executable::before {
+            content: "⚙️";
+            position: absolute;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <button id="selectFolder">选择文件夹</button>
+        <div id="status"></div>
+    </div>
+    
+    <div class="main-content">
+        <div id="output">请点击上方按钮选择一个文件夹...</div>
+        <div id="player">
+            <h3>正在播放</h3>
+            <audio id="audioPlayer" controls></audio>
+            <div id="nowPlaying"></div>
+            <h4>歌词</h4>
+            <div id="lyrics"></div>
+        </div>
+    </div>
+
+    <script defer>
+        let currentDirectoryHandle;
+        let currentFileHandle;
+        let audioPlayer = document.getElementById('audioPlayer');
+        let lyricsData = [];
+        let currentLyricIndex = -1;
+        let lyricInterval;
+        let statusMarquee = false;
+
+        document.getElementById('selectFolder').addEventListener('click', async () => {
+            try {
+                currentDirectoryHandle = await window.showDirectoryPicker();
+                const outputElement = document.getElementById('output');
+                outputElement.innerHTML = '<p>正在扫描文件夹...</p>';
+                
+                outputElement.innerHTML = '';
+                document.getElementById('player').style.display = 'none';
+                updateStatus('');
+                
+                const rootUl = document.createElement('ul');
+                rootUl.className = 'root-dir';
+                
+                const folderTitle = document.createElement('h2');
+                folderTitle.textContent = `文件夹: ${currentDirectoryHandle.name}`;
+                outputElement.appendChild(folderTitle);
+                outputElement.appendChild(rootUl);
+                
+                await processDirectory(currentDirectoryHandle, rootUl, 0);
+                
+                const rootDirElement = rootUl.querySelector('.dir');
+                if (rootDirElement) {
+                    rootDirElement.classList.add('expanded');
+                }
+                
+                updateStatus(`已加载文件夹: ${currentDirectoryHandle.name}`);
+                
+            } catch (error) {
+                if (error.name === 'AbortError') {
+                    updateStatus('用户取消了选择', 'info');
+                } else {
+                    console.error('发生错误:', error);
+                    updateStatus(`错误: ${error.message}`, 'error');
+                }
+            }
+        });
+
+        function updateStatus(message, type = 'info') {
+            const statusElement = document.getElementById('status');
+            
+            if (statusMarquee) {
+                statusElement.classList.remove('marquee');
+                statusElement.innerHTML = '';
+                statusMarquee = false;
+            }
+            
+            if (!message) {
+                statusElement.textContent = '';
+                return;
+            }
+            
+            statusElement.style.backgroundColor = type === 'error' ? '#f8d7da' : '#fff3cd';
+            statusElement.style.color = type === 'error' ? '#721c24' : '#856404';
+            
+            const tempSpan = document.createElement('span');
+            tempSpan.textContent = message;
+            tempSpan.style.visibility = 'hidden';
+            tempSpan.style.position = 'absolute';
+            document.body.appendChild(tempSpan);
+            
+            const textWidth = tempSpan.offsetWidth;
+            document.body.removeChild(tempSpan);
+            
+            if (textWidth > statusElement.offsetWidth) {
+                statusElement.classList.add('marquee');
+                statusElement.innerHTML = `<span>${message}</span>`;
+                statusMarquee = true;
+            } else {
+                statusElement.textContent = message;
+            }
+        }
+
+        async function processDirectory(directoryHandle, parentUl, indentLevel) {
+            const dirLi = document.createElement('li');
+            dirLi.className = 'dir';
+            
+            const dirNameDiv = document.createElement('div');
+            dirNameDiv.className = 'dir-name';
+            dirNameDiv.textContent = directoryHandle.name;
+            dirLi.appendChild(dirNameDiv);
+            
+            const contentUl = document.createElement('ul');
+            dirLi.appendChild(contentUl);
+            
+            parentUl.appendChild(dirLi);
+            
+            dirNameDiv.addEventListener('click', (e) => {
+                e.stopPropagation();
+                dirLi.classList.toggle('expanded');
+            });
+            
+            const entries = [];
+            for await (const entry of directoryHandle.values()) {
+                entries.push(entry);
+            }
+            
+            entries.sort((a, b) => {
+                if (a.kind === b.kind) return a.name.localeCompare(b.name);
+                return a.kind === 'directory' ? -1 : 1;
+            });
+
+            for (const entry of entries) {
+                if (entry.kind === 'file') {
+                    const file = await entry.getFile();
+                    const fileLi = document.createElement('li');
+                    
+                    const fileClass = getFileClass(entry.name);
+                    fileLi.className = fileClass;
+                    
+                    fileLi.textContent = `${entry.name} (${formatFileSize(file.size)})`;
+                    contentUl.appendChild(fileLi);
+                    
+                    fileLi.addEventListener('click', async (e) => {
+                        e.stopPropagation();
+                        
+                        if (fileClass === 'music') {
+                            await playMusicFile(entry, file, directoryHandle);
+                        } else {
+                            updateStatus(`选中文件: ${entry.name} (${formatFileSize(file.size)})`);
+                        }
+                    });
+                    
+                } else if (entry.kind === 'directory') {
+                    await processDirectory(entry, contentUl, indentLevel + 1);
+                }
+            }
+        }
+
+        async function playMusicFile(fileHandle, file, directoryHandle) {
+            try {
+                updateStatus(`正在加载: ${file.name}...`);
+                
+                resetMusicPlayer();
+                
+                const url = URL.createObjectURL(file);
+                audioPlayer.src = url;
+                currentFileHandle = fileHandle;
+                
+                document.getElementById('nowPlaying').textContent = `正在播放: ${file.name}`;
+                document.getElementById('player').style.display = 'block';
+                
+                await loadLrcFile(file.name, directoryHandle);
+                
+                document.querySelectorAll('.music.playing').forEach(el => el.classList.remove('playing'));
+                const musicElements = document.querySelectorAll('.music');
+                for (const el of musicElements) {
+                    if (el.textContent.includes(file.name)) {
+                        el.classList.add('playing');
+                        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        break;
+                    }
+                }
+                
+                await audioPlayer.play();
+                updateStatus(`正在播放: ${file.name}`);
+                
+                startLyricSync();
+                
+            } catch (error) {
+                console.error('播放音乐出错:', error);
+                updateStatus(`无法播放音乐: ${error.message}`, 'error');
+            }
+        }
+
+        function resetMusicPlayer() {
+            audioPlayer.pause();
+            audioPlayer.currentTime = 0;
+            lyricsData = [];
+            currentLyricIndex = -1;
+            clearInterval(lyricInterval);
+            document.getElementById('lyrics').innerHTML = '';
+        }
+
+        async function loadLrcFile(musicFileName, directoryHandle) {
+            const lrcFileName = musicFileName.replace(/\.[^/.]+$/, "") + '.lrc';
+            
+            try {
+                const lrcFileHandle = await directoryHandle.getFileHandle(lrcFileName);
+                const lrcFile = await lrcFileHandle.getFile();
+                const lrcText = await lrcFile.text();
+                
+                lyricsData = parseLrc(lrcText);
+                displayLyrics();
+                
+                updateStatus(`已加载歌词文件: ${lrcFileName}`);
+            } catch (error) {
+                lyricsData = [];
+                document.getElementById('lyrics').innerHTML = '未找到歌词文件';
+                console.log(`未找到歌词文件: ${lrcFileName}`);
+            }
+        }
+
+        function parseLrc(lrcText) {
+            const lines = lrcText.split('\n');
+            const lyrics = [];
+            
+            const timeTagRegex = /\[(\d+):(\d+)\.(\d+)\]/g;
+            
+            for (const line of lines) {
+                let match;
+                let lastIndex = 0;
+                let text = '';
+                
+                while ((match = timeTagRegex.exec(line)) !== null) {
+                    const minutes = parseInt(match[1]);
+                    const seconds = parseInt(match[2]);
+                    const hundredths = parseInt(match[3]);
+                    const time = minutes * 60 + Math.min(59, seconds) + +(String(hundredths).padEnd(9,'0')) / 1000000000;
+                    
+                    const tagEnd = match.index + match[0].length;
+                    if (lastIndex < tagEnd) {
+                        text = line.substring(tagEnd).trim();
+                    }
+                    
+                    if (text) {
+                        lyrics.push({ time, text });
+                    }
+                    
+                    lastIndex = timeTagRegex.lastIndex;
+                }
+            }
+            
+            lyrics.sort((a, b) => a.time - b.time);
+            return lyrics;
+        }
+
+        function displayLyrics() {
+            const lyricsContainer = document.getElementById('lyrics');
+            lyricsContainer.innerHTML = '';
+            
+            if (lyricsData.length === 0) {
+                lyricsContainer.textContent = '无歌词内容';
+                return;
+            }
+            
+            lyricsData.forEach((lyric, index) => {
+                const lyricLine = document.createElement('div');
+                lyricLine.className = 'lyric-line';
+                lyricLine.textContent = lyric.text;
+                lyricLine.dataset.index = index;
+                lyricsContainer.appendChild(lyricLine);
+            });
+        }
+
+        function startLyricSync() {
+            clearInterval(lyricInterval);
+            
+            lyricInterval = setInterval(() => {
+                const currentTime = audioPlayer.currentTime;
+                updateLyrics(currentTime);
+            }, 33);
+        }
+
+        function updateLyrics(currentTime) {
+            if (lyricsData.length === 0) return;
+            
+            let newIndex = -1;
+            for (let i = 0; i < lyricsData.length; i++) {
+                if (lyricsData[i].time <= currentTime) {
+                    newIndex = i;
+                } else {
+                    break;
+                }
+            }
+            
+            if (newIndex !== currentLyricIndex) {
+                currentLyricIndex = newIndex;
+                
+                const lyricLines = document.querySelectorAll('.lyric-line');
+                lyricLines.forEach((line, index) => {
+                    if (index === currentLyricIndex) {
+                        line.classList.add('current');
+                        line.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    } else {
+                        line.classList.remove('current');
+                    }
+                });
+            }
+        }
+
+        function getFileClass(filename) {
+            const lowerName = filename.toLowerCase();
+            const lastDot = lowerName.lastIndexOf('.');
+            let suffix;
+            if (lastDot == -1) {
+                suffix = '';
+            } else {
+                suffix = lowerName.substr(lastDot);
+            }
+            switch (suffix) {
+                case '.mp3':
+                case '.wav':
+                case '.flac':
+                case '.aac':
+                case '.ogg':
+                case '.m4a':
+                case '.m4b':
+                case '.g711a':
+                case '.g711u':
+                    return 'music';
+                case '.txt':
+                case '.md':
+                case '.csv':
+                case '.json':
+                case ".xml":
+                case '.html':
+                case '.css':
+                case '.js':
+                case '.lrc':
+                case '.java':
+                case '.py':
+                case '.go':
+                case '.ts':
+                case '.sass':
+                case '.scss':
+                case '.less':
+                case '.ini':
+                case '.dart':
+                case '.yaml':
+                case '.pom':
+                case '.gitignore':
+                case '.c':
+                case '.h':
+                case '.cpp':
+                case '.hpp':
+                case '.kt':
+                case '.kts':
+                case '.propertise':
+                case '.pro':
+                case '.log':
+                case '.doc':
+                case '.docx':
+                case '.xls':
+                case '.xlsx':
+                case '.pdf':
+                case '.gradle':
+                case '.swift':
+                case '.cs':
+                case '.odt':
+                case '.rtf':
+                case '.ods':
+                case '.odp':
+                case '.wxml':
+                case '.wxss':
+                case '.php':
+                case '.vue':
+                case '.jsp':
+                case '.sql':
+                    return 'text';
+                case '.jpg':
+                case '.jpeg':
+                case '.png':
+                case '.gif':
+                case '.bmp':
+                case '.svg':
+                case '.webp':
+                case '.jfif':
+                    return 'image';
+                case '.zip':
+                case '.rar':
+                case '.7z':
+                case '.tar':
+                case '.gz':
+                    return 'archive';
+                case '.exe':
+                case '.bat':
+                case '.sh':
+                case '.msi':
+                case '.app':
+                case '.apk':
+                    return 'executable';
+                case '.mp4':
+                case '.avi':
+                case '.mkv':
+                case '.mov':
+                case '.wmv':
+                default:
+                    return 'file';
+            }
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        audioPlayer.addEventListener('ended', () => {
+            document.querySelectorAll('.music.playing').forEach(el => el.classList.remove('playing'));
+            clearInterval(lyricInterval);
+        });
+
+        window.addEventListener('resize', () => {
+            const statusElement = document.getElementById('status');
+            if (statusElement.textContent && !statusMarquee) {
+                const tempSpan = document.createElement('span');
+                tempSpan.textContent = statusElement.textContent;
+                tempSpan.style.visibility = 'hidden';
+                tempSpan.style.position = 'absolute';
+                document.body.appendChild(tempSpan);
+                
+                const textWidth = tempSpan.offsetWidth;
+                document.body.removeChild(tempSpan);
+                
+                if (textWidth > statusElement.offsetWidth && !statusMarquee) {
+                    const message = statusElement.textContent;
+                    statusElement.classList.add('marquee');
+                    statusElement.innerHTML = `<span>${message}</span>`;
+                    statusMarquee = true;
+                }
+            }
+        });
+    </script>
+</body>
+</html>
