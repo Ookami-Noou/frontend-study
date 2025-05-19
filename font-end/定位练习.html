@@ -29,6 +29,12 @@
             content: "";
             clear: both;
         }
+        a, a:hover, a:link, a:visited {
+            color: inherit;
+            font-size: inherit;
+            font-weight: inherit;
+            text-decoration: inherit;
+        }
         .position-center {
             top: 0;
             left: 0;
@@ -39,10 +45,11 @@
     </style>
 
     <!-- 带有二级菜单的顶部导航栏 -->
-     <style>
+    <style>
         /* 宽度撑满屏幕，但内容盒只有80%的白色背景头部。定位于最顶部 */
         .header {
             --h: 40px;
+            --theme-color: #ff5000;
             width: 100%;
             height: var(--h);
             line-height: var(--h);
@@ -57,21 +64,48 @@
             right: 0;
             bottom: auto; 
         }
+        /* 左半部分 */
         .header .left {
             float: left;
         }
+        
+        /* 右边部分 */
+        .header .right {
+            float: right;
+        }
+
+
+        /* 注：相对定位和浮动可以共存 */
+        .header .link-container,
         .header .trigger-container {
             margin: 0 20px;
-            position: relative;
             height: var(--h);
+            float: left;
             padding-left: var(--h);
             z-index: 10;
         }
-        .header .trigger-container .trigger {
+        /* 为悬停时展开的二级菜单提供包含块 */
+        .header .trigger-container {
             position: relative;
+        }
+        /* 悬停时选项卡字体颜色变为橙红色 */
+        .header .link-container a:hover {
+            color: var(--theme-color);
+        }
+        /** 请登陆按钮一直显示红色，需要额外处理 */
+        #please-login {
+            color: var(--theme-color);
+        }
+        .header .trigger-container .trigger {
             padding-right: var(--h);
             width: fit-content;
         }
+        /* 
+         * 需要展开二级菜单的选项，为其提供一个显示了右箭头 > 的伪元素，并将该元素定位至右侧居中对齐，初始旋转90度，
+         * 鼠标悬停时旋转至270度。这样在未悬停时显示向下的箭头，悬停时显示向上的箭头
+         * 同时添加一个旋转的动画时间用以过渡
+         * （当然也可以使用一个额外的元素，如img，svg，或者span等，但我懒得多写一个元素了）
+         */
         .header .trigger-container .trigger::after {
             position: absolute;
             content: ">";
@@ -85,17 +119,29 @@
             transform-origin: center;
             text-align: center;
         }
+        /*
+         * 下面将悬停后展开二级菜单的元素称为 展开按钮
+         * 将被展开的二级菜单的完整容器成为 二级菜单
+         */
+        /* 当鼠标悬停至 展开按钮 和 二级容器 时，使 展开按钮 后的箭头伪元素的箭头向上 */
         .header .trigger-container .trigger:hover::after,
         .trigger-container:has(.extend:hover) .trigger::after {
             transform: rotate(270deg);
         }
+        /* 当鼠标悬停至 展开按钮 和 二级容器 时，使 展开按钮 的字体颜色变为 橙红色 */
         .header .trigger-container .trigger:hover,
         .trigger-container:has(.extend:hover) .trigger {
-            color: #ff5000;
+            color: var(--theme-color);
         }
-        .header .trigger-container .trigger:hover ~ .extend {
+        /* 当鼠标悬停至 展开按钮 和 二级容器 时，使 展开按钮 的兄弟元素 二级菜单 显示出来 */
+        .header .trigger-container .trigger:hover ~ .extend,
+        .header .trigger-container .extend:hover {
             display: block;
         }
+        /*
+         * 二级菜单 初始不显示，直至鼠标悬停至其 .trigger 的前导兄弟元素 展开按钮 时才将其显示
+         * 使用绝对定位，使该 二级菜单 相对于其前导兄弟元素向下移动一个身位，避免遮挡导航栏
+         */
         .header .trigger-container .extend {
             padding: 10px;
             border: 1px solid #ccc;
@@ -113,27 +159,28 @@
             background-color: #fff;
             z-index: 99;
         }
+        
         .header .trigger-container .extend::-webkit-scrollbar {
             display: none;
         }
-        .header .trigger-container .extend:hover {
-            display: block;
-        }
+        /* 这一段主要防止文本超过浏览器视口宽度导致出现问题 */
         .header .trigger-container .extend .extend-elem {
-            width: 100%;
             overflow-x: hidden;
+            max-width: 80vw;
             text-overflow: ellipsis;
             white-space: nowrap;
             text-align: center;
             cursor: pointer;
+            padding: 1px 10px;
         }
+        /* 列表内每个元素在鼠标悬停时显示灰色背景 */
         .header .trigger-container .extend .extend-elem:hover {
             background-color: #ccc;
         }
-     </style>
+    </style>
 
     <!-- 轮播图 -->
-     <style>
+    <style>
         .body {
             width: 100%;
         }
@@ -181,6 +228,8 @@
             background-color: #fff;
             float: left;
             object-fit: contain;
+            box-sizing: border-box;
+            border-right: 1px solid #ccc;
         }
         @keyframes move-left {
             0% {
@@ -261,11 +310,11 @@
             --h: 400px; /* 每张轮播图高度 */
             --i: 3;     /* 轮播图数量 */
         }
-     </style>
+    </style>
 </head>
 <body>
     <header class="header float-container">
-        <div class="left">
+        <div class="left float-container">
             <div class="trigger-container">
                 <div class="trigger">光之国</div>
                 <ul class="extend">
@@ -277,6 +326,46 @@
                     <li class="extend-elem">基沃托斯</li>
                     <li class="extend-elem">真新镇</li>
                     <li class="extend-elem">海拉鲁王国</li>
+                </ul>
+            </div>
+            <div id="please-login" class="link-container">
+                <a href="">亲，请登录</a>
+            </div>
+            <div class="link-container">
+                <a href="">免费注册</a>
+            </div>
+            <div class="link-container">
+                <a href="">网页无障碍</a>
+            </div>
+        </div>
+        <div class="right float-container">
+            <div class="link-container">
+                <a href="">购物车</a>
+            </div>
+            <div class="trigger-container">
+                <div class="trigger">买家中心</div>
+                <ul class="extend">
+                    <li class="extend-elem">我的购物单</li>
+                    <li class="extend-elem">我的卡券包</li>
+                    <li class="extend-elem">我收藏的店铺</li>
+                    <li class="extend-elem">我收藏的商品</li>
+                </ul>
+            </div>
+            <div class="trigger-container">
+                <div class="trigger">卖家中心</div>
+                <ul class="extend">
+                    <li class="extend-elem">天猫开店</li>
+                    <li class="extend-elem">直播开店</li>
+                </ul>
+            </div>
+            <div class="trigger-container">
+                <div class="trigger">帮助中心</div>
+                <ul class="extend">
+                    <li class="extend-elem">官方客服</li>
+                    <li class="extend-elem">商家客服</li>
+                    <li class="extend-elem">消息中心</li>
+                    <li class="extend-elem">意见反馈</li>
+                    <li class="extend-elem">举报中心</li>
                 </ul>
             </div>
         </div>
