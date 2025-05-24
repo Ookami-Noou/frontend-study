@@ -1,0 +1,131 @@
+/* 宽度撑满屏幕，但内容盒只有80%的白色背景头部。定位于最顶部 */
+.header {
+    --h: 40px;
+    --theme-color: #ff5000;
+    width: 100%;
+    height: var(--h);
+    line-height: var(--h);
+    background-color: #fff;
+    color: #000;
+    padding: 0 10%;
+    position: fixed;
+    box-sizing: border-box;
+    border-bottom: 1px solid #ccc;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: auto; 
+}
+/* 左半部分 */
+.header .left {
+    float: left;
+}
+
+/* 右边部分 */
+.header .right {
+    float: right;
+}
+
+
+/* 注：相对定位和浮动可以共存 */
+.header .link-container,
+.header .trigger-container {
+    margin: 0 20px;
+    height: var(--h);
+    float: left;
+    padding-left: var(--h);
+    z-index: 10;
+}
+/* 为悬停时展开的二级菜单提供包含块 */
+.header .trigger-container {
+    position: relative;
+}
+/* 悬停时选项卡字体颜色变为橙红色 */
+.header .link-container a:hover {
+    color: var(--theme-color);
+}
+/** 请登陆按钮一直显示红色，需要额外处理 */
+#please-login {
+    color: var(--theme-color);
+}
+.header .trigger-container .trigger {
+    padding-right: var(--h);
+    width: fit-content;
+}
+/* 
+    * 需要展开二级菜单的选项，为其提供一个显示了右箭头 > 的伪元素，并将该元素定位至右侧居中对齐，初始旋转90度，
+    * 鼠标悬停时旋转至270度。这样在未悬停时显示向下的箭头，悬停时显示向上的箭头
+    * 同时添加一个旋转的动画时间用以过渡
+    * （当然也可以使用一个额外的元素，如img，svg，或者span等，但我懒得多写一个元素了）
+    */
+.header .trigger-container .trigger::after {
+    position: absolute;
+    content: ">";
+    top: 0;
+    right: 0;
+    line-height: var(--h);
+    height: var(--h);
+    width: var(--h);
+    transition-duration: .25s;
+    transform: rotate(90deg);
+    transform-origin: center;
+    text-align: center;
+}
+/*
+    * 下面将悬停后展开二级菜单的元素称为 展开按钮
+    * 将被展开的二级菜单的完整容器成为 二级菜单
+    */
+/* 当鼠标悬停至 展开按钮 和 二级容器 时，使 展开按钮 后的箭头伪元素的箭头向上 */
+.header .trigger-container .trigger:hover::after,
+.trigger-container:has(.extend:hover) .trigger::after {
+    transform: rotate(270deg);
+}
+/* 当鼠标悬停至 展开按钮 和 二级容器 时，使 展开按钮 的字体颜色变为 橙红色 */
+.header .trigger-container .trigger:hover,
+.trigger-container:has(.extend:hover) .trigger {
+    color: var(--theme-color);
+}
+/* 当鼠标悬停至 展开按钮 和 二级容器 时，使 展开按钮 的兄弟元素 二级菜单 显示出来 */
+.header .trigger-container .trigger:hover ~ .extend,
+.header .trigger-container .extend:hover {
+    display: block;
+}
+/*
+    * 二级菜单 初始不显示，直至鼠标悬停至其 .trigger 的前导兄弟元素 展开按钮 时才将其显示
+    * 使用绝对定位，使该 二级菜单 相对于其前导兄弟元素向下移动一个身位，避免遮挡导航栏
+    */
+.header .trigger-container .extend {
+    padding: 10px;
+    border: 1px solid #ccc;
+    display: none;
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: absolute;
+    top: var(--h);
+    left: 50%;
+    transform: translateX(-50%);
+    overflow: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    background-color: #fff;
+    z-index: 99;
+}
+
+.header .trigger-container .extend::-webkit-scrollbar {
+    display: none;
+}
+/* 这一段主要防止文本超过浏览器视口宽度导致出现问题 */
+.header .trigger-container .extend .extend-elem {
+    overflow-x: hidden;
+    max-width: 80vw;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-align: center;
+    cursor: pointer;
+    padding: 1px 10px;
+}
+/* 列表内每个元素在鼠标悬停时显示灰色背景 */
+.header .trigger-container .extend .extend-elem:hover {
+    background-color: #ccc;
+}

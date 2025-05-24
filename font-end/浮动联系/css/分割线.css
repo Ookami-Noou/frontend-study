@@ -1,0 +1,40 @@
+.sep {
+    height: 60px;
+    background-color: #47464a;
+    margin: 0 0 20px;
+    top: 80px;
+    color: #ccc;
+    margin-bottom: 40px;
+}
+.sep .selection-container {
+    width: fit-content;
+    margin: 0 auto;
+    padding: 0;
+    height: 60px;
+}
+.sep .selection-container .selection {
+    line-height: 60px;
+    float: left;
+    margin: 0 30px;
+    cursor: pointer;
+}
+.sep .selection-container .selection:hover {
+    color: #fff;
+}
+.sep .selection-container .selection.active {
+    color: #ef4238;
+    position: relative;
+    overflow: hidden;
+    cursor: default;
+}
+.sep .selection-container .selection.active::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: calc(50% - 8px);
+    width: 16px;
+    height: 16px;
+    background-color: #fff;
+    transform-origin: center;
+    transform: rotate(45deg);
+}

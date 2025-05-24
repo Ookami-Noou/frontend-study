@@ -1,0 +1,133 @@
+.body {
+    width: 100%;
+}
+/* 
+    * 轮播图部分。使其绝对定位至屏幕中心位置，所以使用 绝对定位/固定定位 + 四个方向为0 + margin: auto（定义在 position-center 中）。
+    * 实际没必要但我感觉这样看着会舒服一点，让图片显示在视图正中心。
+    * 变量定义在该style元素的末尾，避免改了DOM的图片数量后忘记修改 --i 变量值
+    */
+.body .popup-carousel-container .carousel-container {
+    width: var(--w);
+    height: var(--h);
+    position: fixed;
+    overflow: hidden;
+    border: 2px #ccc solid;
+}
+/*
+    * 使所有图片横向排列，结合父元素的 overflow: hidden，使其一次性只能显示一张图片宽度的内容。
+    * 应用一个向左移动的动画循环播放，向左移动的距离是 轮播图数量 * 轮播图宽度
+    * 由于在轮播图的最后存在一张额外的第一张图片的拷贝，但是实际播放到最后一张图片的末尾时动画已经结束开启新一轮循环，
+    * 所以视觉上是无限循环。
+    * 由于在最后存在额外一张第一个图片的拷贝，所以为了让所有图片平铺，实际宽度应该是 （图片数量 + 1） * 图片宽度
+    */
+.body .popup-carousel-container .carousel-container .carousel {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: var(--h);
+    width: calc(var(--w) * (var(--i) + 1));
+    animation: move-left calc(5s * var(--i)) linear infinite;
+}
+/* 鼠标没有悬停在轮播图上时，播放动画 */
+.body .popup-carousel-container .carousel-container .carousel:not(:hover) {
+    animation-play-state: running;
+}
+/* 鼠标悬停在轮播图上，或者悬停在弹出的图片上时，暂停轮播动画 */
+.body .popup-carousel-container .carousel-container .carousel:hover,
+.body .popup-carousel-container:has(.popup-container .carousel-elem:hover) .carousel-container .carousel {
+    animation-play-state: paused;
+}
+/* 对于每一个轮播图元素，固定宽高，左浮动，为了让其一字排开 */
+.body .popup-carousel-container .carousel-container .carousel .carousel-elem {
+    width: var(--w);
+    height: var(--h);
+    object-fit:cover;
+    background-color: #fff;
+    float: left;
+    object-fit: contain;
+    box-sizing: border-box;
+    border-right: 1px solid #ccc;
+}
+@keyframes move-left {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(calc(-1 * var(--w) * var(--i)));
+    }
+}
+
+/* 在鼠标悬停时额外出现的弹层。由于初始不显示，所以初始 display 为 none。铺满整个屏幕，并存在一个透明度为 0x66 的黑色背景 */
+.body .popup-carousel-container .popup-container {
+    display: none;
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    box-sizing: border-box;
+    background-color: #00000066;
+}
+/* 当鼠标悬停在任何轮播图图片，或悬停在任何弹层中额外弹出的图片上时，显示弹层 */
+.body .popup-carousel-container:has(.carousel-container .carousel .carousel-elem:hover) .popup-container,
+.body .popup-carousel-container:has(.popup-container .carousel-elem:hover) .popup-container {
+    display: block;
+}
+/* 对于弹层中的图片，其宽高不能过大，否则无法通过css隐藏弹层。初始所有弹层中的图片隐藏 */
+.body .popup-carousel-container .popup-container .carousel-elem {
+    max-width: 80vw;
+    max-height: 80vh;
+    min-width: var(--w);
+    min-height: var(--h);
+    position: absolute;
+    display: none;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+}
+
+/*
+    * 对于每一张轮播图的图片时，鼠标悬停在哪一张图片上，弹层中对应位置的图片应该显示而其他图片应该隐藏。
+    * 如果鼠标悬停在弹层的图片上但离开了轮播图图片的有效区域时，不应该隐藏弹层，所以添加两个选择器。
+    *
+    * unused 并没有实际作用，仅仅为了占位使用，这样最后一个有效的选择器后可以添加一个 , ，后续拓展时可以 ctrl + c/v 快速编写
+    */
+.body .popup-carousel-container:has(.carousel-container .carousel .carousel-elem:nth-child(1):hover) .popup-container .carousel-elem:nth-child(1),
+.body .popup-carousel-container:has(.popup-container .carousel-elem:nth-child(1):hover) .popup-container .carousel-elem:nth-child(1),
+
+.body .popup-carousel-container:has(.carousel-container .carousel .carousel-elem:nth-child(2):hover) .popup-container .carousel-elem:nth-child(2),
+.body .popup-carousel-container:has(.popup-container .carousel-elem:nth-child(2):hover) .popup-container .carousel-elem:nth-child(2),
+
+.body .popup-carousel-container:has(.carousel-container .carousel .carousel-elem:nth-child(3):hover) .popup-container .carousel-elem:nth-child(3),
+.body .popup-carousel-container:has(.popup-container .carousel-elem:nth-child(3):hover) .popup-container .carousel-elem:nth-child(3),
+
+.body .popup-carousel-container:has(.carousel-container .carousel .carousel-elem:nth-child(4):hover) .popup-container .carousel-elem:nth-child(4),
+.body .popup-carousel-container:has(.popup-container .carousel-elem:nth-child(4):hover) .popup-container .carousel-elem:nth-child(4),
+
+.unused
+{
+    display: block;
+}
+
+/**
+ * 修改轮播图数量的步骤：
+ * Step 1：在 .body > .popup-carousel-container > .carousel-container > .carousel 下添加或删掉 img 元素。
+ *         注意保持 class 属性应该一致。
+ *         注意在最后额外添加一个第一张图片的拷贝以保证视觉上的无限循环
+ *
+ * Step 2：将 step.1 中修改后的图片元素按顺序拷贝到 .body > .popup-carousel-container > .popup-container 下。
+ *
+ * Step 3: 将 .body .popup-carousel-container .carousel-container 规则下的 --i 变量替换为实际的图片数量。
+ *         注意该数量不包括最后面额外添加的拷贝
+ * 
+ * Step 4: 在 95 行 开始的那一大坨里，随便找两个挨着的行复制，如 95, 96行 --i 的值有多少，就复制 --i + 1 个。注意这个是包括了最后一张图片的。
+ *         把添加后的一大坨，从 1 开始，一直到最后，依次 + 1。
+ *         如果是删除，则从后往前，删除了几个图片就删除多少对应的连续的行就行。当然不删除也完全不会有问题
+ */
+
+/* 为了避免忘记修改变量值，所以将变量定义在这里 */
+.body .popup-carousel-container .carousel-container {
+    --w: 860px; /* 每张轮播图宽度 */
+    --h: 400px; /* 每张轮播图高度 */
+    --i: 3;     /* 轮播图数量 */
+}

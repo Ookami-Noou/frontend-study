@@ -1,0 +1,30 @@
+.body .pages {
+    width: fit-content;
+    max-width: 100%;
+    margin: 20px auto;
+    list-style: none;
+}
+.body .pages::after {
+    display: block;
+    content: "";
+    clear: both;
+}
+.body .pages .page {
+    border: solid 1px #ccc;
+    padding: 5px 15px;
+    height: 1.3em;
+    line-height: 1.3em;
+    font-size: 1.1em;
+    float: left;
+    margin: 0 10px;
+    cursor: pointer;
+}
+.body .pages .page:hover {
+    border-color: #ef4238;
+}
+.body .pages .page.active {
+    color: #fff;
+    background-color: #ef4238;
+    border-color: #ef4238;
+    cursor: default;
+}

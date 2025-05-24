@@ -1,0 +1,44 @@
+.body .movies {
+    width: 100%;
+    padding: 0 10px;
+}
+.body .movies::after {
+    display: block;
+    content: "";
+    clear: both;
+}
+.body .movies .movie-elem {
+    width: 160px;
+    height: 300px;
+    float: left;
+    margin: 10px 13px;
+    overflow: hidden;
+}
+.body .movies .movie-elem .movie-image {
+    width: 160px;
+    height: 220px;
+}
+.body .movies .movie-elem .movie-title {
+    display: block;
+    max-width: 160px;
+    width: fit-content;
+    height: 1.1em;
+    line-height: 1.1em;
+    margin: 4px auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-all;
+    white-space: nowrap;
+}
+.body .movies .movie-elem .movie-score {
+    display: block;
+    max-width: 160px;
+    width: fit-content;
+    font-size: 1.6em;
+    color: gold;
+    margin: 0 auto;
+    font-style: italic;
+}
+.body .movies a {
+    cursor: pointer;
+}
