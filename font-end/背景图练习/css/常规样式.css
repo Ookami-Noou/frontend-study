@@ -1,0 +1,42 @@
+body {
+    --font-size: 16px;
+    padding: unset;
+    margin: unset;
+    font-size: var(--font-size);
+    width: 100vw;
+    height: auto;
+    min-height: 100vh;
+    min-width: 768px;
+}
+li, ul, ol {
+    padding: unset;
+    margin: unset;
+    list-style: none;
+}
+*::after, *::before {
+    display: block;
+}
+.float-container::after {
+    display: block;
+    content: "";
+    clear: both;
+}
+a, a:hover, a:link, a:visited {
+    color: inherit;
+    font-size: inherit;
+    font-weight: inherit;
+    text-decoration: inherit;
+}
+.position-center {
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+}
+.left {
+    float: left;
+}
+.right {
+    float: right;
+}

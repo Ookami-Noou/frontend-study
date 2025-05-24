@@ -1,0 +1,104 @@
+body {
+    width: 100%;
+    height: 100vh;
+    background: url("../photo/bg.jpg") no-repeat center / auto 100%;
+    position: relative;
+}
+.header {
+    width: 98vw;
+    color: #fff;
+    border-radius: 10px;
+    background-color: rgba(60, 42, 41, 0.8);
+    position: fixed;
+    top: 20px;
+    left: 1vw;
+    right: 1vw;
+    height: 72px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    line-height: 47px;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+.header .nav {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+}
+.header .nav * {
+    cursor: pointer;
+}
+.header .nav .btn {
+    width: fit-content;
+    height: 47px;
+    background-color: transparent;
+    padding: 0 25px;
+    margin: 0 10px;
+    border-radius: 10px;
+}
+.header .nav .btn:hover {
+    background-color: #ffffff11;
+}
+.header .nav .btn.dark-bg {
+    background-color: #180f01;
+}
+.header .nav .btn.dark-bg:hover {
+    background-color: #20170e;
+}
+.header .nav .btn.red-bg {
+    background-color: #AA2409;
+}
+.header .nav .btn.red-bg:hover {
+    background-color: #B23300;
+}
+
+.header .nav .game-logo {
+    width: 140px;
+    height: 100%;
+    background-color: #231919;
+    border-top-left-radius: 10px;
+    border-bottom-left-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.header .nav .game-logo .logo {
+    width: 80px;
+    height: 32px;
+    object-fit: fill;
+}
+.header .nav .logo {
+    width: 60px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 10px;
+}
+.header .nav .logo .logo {
+    width: 48px;
+    height: 48px;
+    object-fit: fill;
+}
+
+/* 散落在世界各处的图标、图片和按钮 */
+.r16 {
+    height: 120px;
+    width: 92px;
+    position: absolute;
+    left: 1vw;
+    top: 97px;
+}
+
+.r16 img {
+    transition-duration: .25s;
+    height: 120px;
+    width: 92px;
+}
+.r16:hover img {
+    transform: translateY(-5px);
+}
