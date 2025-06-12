@@ -1,0 +1,123 @@
+/* r16 */
+.r16 {
+    height: 120px;
+    width: 92px;
+    position: absolute;
+    left: 1vw;
+    top: 97px;
+}
+
+.r16 img {
+    transition-duration: .25s;
+    height: 120px;
+    width: 92px;
+    cursor: pointer;
+}
+.r16:hover img {
+    transform: translateY(-5px);
+}
+
+
+/* 右侧板边的三个按钮 */
+.right-btns {
+    position: absolute;
+    right: 2px;
+    overflow: hidden;
+    top: 20vh;
+    width: 146px;
+    height: 255px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+}
+
+.right-btns .btn {
+    text-align: right;
+    height: 74px;
+    width: 146px;
+    padding-right: .5em;
+    box-sizing: border-box;
+    line-height: 74px;
+    color: #f7ffff;
+    cursor: pointer;
+}
+
+.right-btns .btn.hidden {
+    transform: translateX(90px);
+    transition-duration: .5s;
+}
+
+.right-btns .btn.hidden:hover {
+    transform: translateX(0px);
+}
+
+.right-btns .btn.hidden div {
+    display: none;
+}
+.right-btns .btn.btn.hidden:hover div {
+    display: block;
+}
+
+.right-btns .btn:nth-child(1) {
+    background: url("../photo/rb-1.png") no-repeat transparent 0 0 / 100% 100% border-box;
+}
+.right-btns .btn:nth-child(2) {
+    background: url("../photo/rb-2.png") no-repeat transparent 0 0 / 100% 100% border-box;
+}
+.right-btns .btn:nth-child(3) {
+    background: url("../photo/rb-3.png") no-repeat transparent 0 0 / 100% 100% border-box;
+}
+
+
+/* 右下角两个按钮 */
+.right-bottom-btns {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    width: 150px;
+    height: 74px;
+    font-size: 12px;
+}
+
+.right-bottom-btns .btn {
+    width: 60px;
+    height: 100%;
+    padding: 10px 4px 4px 4px;
+    box-sizing: border-box;
+    border: solid silver .2px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    cursor: pointer;
+    background-color: black;
+}
+
+.right-bottom-btns .btn .icon {
+    width: 35px;
+    height: 35px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.right-bottom-btns .btn .text {
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+    color:#ddde9e;
+}
+
+.right-bottom-btns .btn:hover .text {
+    color: #f7ffff;
+}
+
+.right-bottom-btns .btn.conn-us .icon {
+    background: url("../photo/spirit.png") no-repeat -1585px -693px / auto border-box;
+}
+
+.right-bottom-btns .btn.bug-report .icon {
+    background: url("../photo/spirit.png") no-repeat -1545px -693px / auto border-box;
+}

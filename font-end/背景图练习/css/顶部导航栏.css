@@ -1,18 +1,27 @@
 body {
+    min-width: 1032px;
+}
+
+.all-container {
     width: 100%;
     height: 100vh;
+    min-width: 1032px;
     background: url("../photo/bg.jpg") no-repeat center / auto 100%;
     position: relative;
+    overflow: hidden;
+    margin: 0 auto;
 }
+
 .header {
-    width: 98vw;
+    width: 98%;
+    min-width: 1030px;
     color: #fff;
     border-radius: 10px;
     background-color: rgba(60, 42, 41, 0.8);
     position: fixed;
     top: 20px;
-    left: 1vw;
-    right: 1vw;
+    left: 1%;
+    right: 1%;
     height: 72px;
     display: flex;
     flex-direction: row;
@@ -21,6 +30,7 @@ body {
     line-height: 47px;
     font-weight: bold;
     font-size: 1.1em;
+    user-select: none;
 }
 .header .nav {
     display: flex;
@@ -83,22 +93,4 @@ body {
     width: 48px;
     height: 48px;
     object-fit: fill;
-}
-
-/* 散落在世界各处的图标、图片和按钮 */
-.r16 {
-    height: 120px;
-    width: 92px;
-    position: absolute;
-    left: 1vw;
-    top: 97px;
-}
-
-.r16 img {
-    transition-duration: .25s;
-    height: 120px;
-    width: 92px;
-}
-.r16:hover img {
-    transform: translateY(-5px);
 }
