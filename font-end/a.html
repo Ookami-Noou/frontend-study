@@ -5,10 +5,155 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
-        
+        .red {
+            --color: #ff0000;
+        }
+        .yellow {
+            --color: #ffff00;
+        }
+        .blue {
+            --color: #0000ff;
+        }
+        .orange {
+            --color: #ff8800;
+        }
+        .green {
+            --color: #00ff88;
+        }
+        .purpol {
+            --color: #8800ff;
+        }
+        .black {
+            --color: #000000;
+        }
+        .white {
+            --color: #ffffff;
+        }
+        .pink {
+            --color: #ff00ff;
+        }
+        .gray {
+            --color: #888888;
+        }
+    </style>
+
+    <style>
+        body {
+            margin: unset;
+            border: unset;
+            padding: 20px 0;
+        }
+        .landscroll {
+            rotate: 270deg;
+            transform-origin: 100px 100px;
+            width: auto;
+            height: calc(100vw - 50px);
+            margin: auto;
+            overflow-y: scroll;
+            margin-top: 25px;
+            margin-left: 25px;
+        }
+        .landscroll .container {
+            flex-direction: column;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .landscroll .container .box {
+            rotate: 90deg;
+        }
+
+        .vertical {
+            width: calc(100vw - 50px);
+            height: fit-content;
+            padding: 0 25px;
+            overflow-x: scroll;
+            overflow-y: hidden;
+        }
+        .vertical .container {
+            width: 4000px;
+        }
+        .vertical .container .box {
+            float: left;
+        }
+
+
+        .container .box {
+            width: 200px;
+            height: 200px;
+            box-sizing: border-box;
+            border: #333 2px solid;
+            background: var(--color) border-box;
+            font-size: 30px;
+            font-weight: bold;
+            color: #000;
+            text-align: center;
+            line-height: 200px;
+            text-shadow: 
+                2px  2px  2px #fff,
+                -2px 2px  2px #fff,
+                2px  -2px 2px #fff,
+                -2px -2px 2px #fff,
+                2px  0px  2px #fff,
+                0px  2px  2px #fff,
+                -2px 0px  2px #fff,
+                0px  -2px 2px #fff;
+            cursor: cell;
+        }
+        .container .box:nth-child(2n) {
+            border-color: #ccc;
+        }
+
     </style>
 </head>
 <body>
-    
+    <div class="landscroll">
+        <div class="container">
+            <div class="box red">01</div>
+            <div class="box yellow">02</div>
+            <div class="box blue">03</div>
+            <div class="box green">04</div>
+            <div class="box purpol">05</div>
+            <div class="box black">06</div>
+            <div class="box white">07</div>
+            <div class="box orange">08</div>
+            <div class="box pink">09</div>
+            <div class="box gray">10</div>
+            <div class="box gray">11</div>
+            <div class="box pink">12</div>
+            <div class="box orange">13</div>
+            <div class="box white">14</div>
+            <div class="box black">15</div>
+            <div class="box purpol">16</div>
+            <div class="box green">17</div>
+            <div class="box blue">18</div>
+            <div class="box yellow">19</div>
+            <div class="box red">20</div>
+        </div>
+    </div>
+    <div class="vertical">
+        <div class="container">
+            <div class="box red">01</div>
+            <div class="box yellow">02</div>
+            <div class="box blue">03</div>
+            <div class="box green">04</div>
+            <div class="box purpol">05</div>
+            <div class="box black">06</div>
+            <div class="box white">07</div>
+            <div class="box orange">08</div>
+            <div class="box pink">09</div>
+            <div class="box gray">10</div>
+            <div class="box gray">11</div>
+            <div class="box pink">12</div>
+            <div class="box orange">13</div>
+            <div class="box white">14</div>
+            <div class="box black">15</div>
+            <div class="box purpol">16</div>
+            <div class="box green">17</div>
+            <div class="box blue">18</div>
+            <div class="box yellow">19</div>
+            <div class="box red">20</div>
+        </div>
+    </div>
 </body>
 </html>

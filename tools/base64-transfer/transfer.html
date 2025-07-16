@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片转Base64转换器</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background-color: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+            color: white;
+            padding: 25px 30px;
+            text-align: center;
+        }
+        
+        h1 {
+            font-size: 28px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+        
+        .content {
+            display: flex;
+            padding: 30px;
+        }
+        
+        .panel {
+            flex: 1;
+            padding: 20px;
+        }
+        
+        .left-panel {
+            border-right: 1px solid #eee;
+        }
+        
+        .panel-title {
+            font-size: 18px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .file-selector {
+            border: 2px dashed #c3cfe2;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background-color: #f9fbfd;
+        }
+        
+        .file-selector:hover {
+            border-color: #4b6cb7;
+            background-color: #f0f5ff;
+        }
+        
+        .file-selector i {
+            font-size: 48px;
+            color: #4b6cb7;
+            margin-bottom: 15px;
+        }
+        
+        .file-selector h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .file-selector p {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .file-selector button {
+            background-color: #4b6cb7;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        
+        .file-selector button:hover {
+            background-color: #3a5aa0;
+        }
+        
+        .preview-container {
+            margin-top: 20px;
+            text-align: center;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .preview-image {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+        
+        .action-buttons {
+            margin-top: 25px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .btn-convert {
+            background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+            color: white;
+        }
+        
+        .btn-convert:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(75, 108, 183, 0.4);
+        }
+        
+        .btn-convert:disabled {
+            background: #95a5a6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .result-container {
+            height: 95%;
+            position: relative;
+            border: 1px solid #e0e7ff;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        textarea {
+            width: 100%;
+            height: 100%;
+            padding: 15px;
+            border: none;
+            resize: none;
+            font-family: monospace;
+            font-size: 13px;
+            background-color: #f8f9ff;
+            color: #2c3e50;
+        }
+        
+        textarea:focus {
+            outline: none;
+        }
+        
+        .copy-btn {
+            position: absolute;
+            right: 15px;
+            bottom: 15px;
+            background: linear-gradient(90deg, #4b6cb7 0%, #182848 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+        }
+        
+        .copy-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(75, 108, 183, 0.4);
+        }
+        
+        .copy-btn:active {
+            transform: translateY(0);
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #2ecc71;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateX(200%);
+            transition: transform 0.3s ease;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #4b6cb7;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        footer {
+            text-align: center;
+            padding: 20px;
+            color: #7f8c8d;
+            font-size: 14px;
+            border-top: 1px solid #eee;
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                flex-direction: column;
+            }
+            
+            .left-panel {
+                border-right: none;
+                border-bottom: 1px solid #eee;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-image"></i> 图片转Base64转换器</h1>
+            <p class="subtitle">上传图片并转换为Base64编码格式，一键复制到剪贴板</p>
+        </header>
+        
+        <div class="content">
+            <div class="panel left-panel">
+                <div class="panel-title">
+                    <i class="fas fa-upload"></i> 图片上传
+                </div>
+                
+                <div class="file-selector" id="fileSelector">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <h3>选择图片文件</h3>
+                    <p>支持 JPG, PNG, GIF 格式，最大文件大小 5MB</p>
+                    <button id="selectBtn">选择图片</button>
+                    <input type="file" id="fileInput" accept="image/*" style="display: none;">
+                </div>
+                
+                <div class="preview-container">
+                    <img id="previewImage" class="preview-image" alt="预览图">
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="convertBtn" class="btn btn-convert" disabled>
+                        <i class="fas fa-sync-alt"></i> 转换为Base64
+                    </button>
+                </div>
+                
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <p>正在转换中，请稍候...</p>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <div class="panel-title">
+                    <i class="fas fa-code"></i> Base64 结果
+                </div>
+                
+                <div class="result-container">
+                    <textarea id="resultText" placeholder="转换后的Base64编码将显示在这里..." readonly></textarea>
+                    <button id="copyBtn" class="copy-btn">
+                        <i class="fas fa-copy"></i> 复制到剪贴板
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>© 2023 图片转Base64转换器 | 简单易用的图片编码工具</p>
+        </footer>
+    </div>
+    
+    <div class="notification" id="notification">
+        <i class="fas fa-check-circle"></i>
+        <span>Base64编码已复制到剪贴板！</span>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileInput = document.getElementById('fileInput');
+            const fileSelector = document.getElementById('fileSelector');
+            const selectBtn = document.getElementById('selectBtn');
+            const previewImage = document.getElementById('previewImage');
+            const convertBtn = document.getElementById('convertBtn');
+            const resultText = document.getElementById('resultText');
+            const copyBtn = document.getElementById('copyBtn');
+            const loading = document.getElementById('loading');
+            const notification = document.getElementById('notification');
+            
+            // 打开文件选择对话框
+            // selectBtn.addEventListener('click', () => fileInput.click());
+            fileSelector.addEventListener('click', () => fileInput.click());
+            
+            // 处理文件选择
+            fileInput.addEventListener('change', function(e) {
+                if (this.files && this.files[0]) {
+                    const file = this.files[0];
+                    const fileSize = file.size / 1024 / 1024; // in MB
+                    
+                    // 检查文件大小
+                    if (fileSize > 5) {
+                        alert('文件大小不能超过5MB');
+                        return;
+                    }
+                    
+                    // 检查文件类型
+                    if (!file.type.match('image.*')) {
+                        alert('请选择图片文件（JPG, PNG, GIF）');
+                        return;
+                    }
+                    
+                    // 显示图片预览
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        previewImage.src = e.target.result;
+                        previewImage.style.display = 'block';
+                        convertBtn.disabled = false;
+                        convertBtn.parentElement.style.display = 'flex';
+                    }
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // 转换按钮事件
+            convertBtn.addEventListener('click', function() {
+                if (!previewImage.src) return;
+                
+                // 显示加载状态
+                loading.style.display = 'block';
+                convertBtn.disabled = true;
+                convertBtn.parentElement.style.display = 'none';
+                
+                // 模拟转换过程（实际转换是即时的）
+                setTimeout(() => {
+                    // 获取Base64编码（移除前面的data URL部分）
+                    const base64Data = previewImage.src;
+                    resultText.value = base64Data;
+                    
+                    // 隐藏加载状态
+                    loading.style.display = 'none';
+                    convertBtn.disabled = false;
+                    convertBtn.parentElement.style.display = 'flex';
+                }, 800);
+            });
+            
+            // 复制按钮事件
+            copyBtn.addEventListener('click', function() {
+                if (!resultText.value) {
+                    alert('没有内容可复制');
+                    return;
+                }
+                
+                // 复制到剪贴板
+                resultText.select();
+                document.execCommand('copy');
+                
+                // 显示通知
+                notification.classList.add('show');
+                
+                // 隐藏通知
+                setTimeout(() => {
+                    notification.classList.remove('show');
+                }, 3000);
+            });
+        });
+    </script>
+</body>
+</html>

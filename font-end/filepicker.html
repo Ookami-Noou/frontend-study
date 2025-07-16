@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文件16进制比较器</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .file-inputs {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 20px;
+        }
+        .hex-display {
+            display: flex;
+            justify-content: space-between;
+        }
+        .hex-box {
+            width: 48%;
+            height: 500px;
+            overflow: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            word-break: break-all;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            text-align: center;
+        }
+        .file-info {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        .diff {
+            background-color: #ffb6c1; /* 浅红色背景 */
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <h1>文件16进制比较器</h1>
+    <div class="container">
+        <div class="file-inputs">
+            <div>
+                <input type="file" id="file1">
+                <div class="file-info" id="file1-info">未选择文件</div>
+            </div>
+            <div>
+                <input type="file" id="file2">
+                <div class="file-info" id="file2-info">未选择文件</div>
+            </div>
+        </div>
+        <div class="hex-display">
+            <div class="hex-box" id="hex1"></div>
+            <div class="hex-box" id="hex2"></div>
+        </div>
+    </div>
+
+    <script>
+        let file1Data = null;
+        let file2Data = null;
+        let isScrolling = false;
+        
+        document.getElementById('file1').addEventListener('change', function(e) {
+            handleFileSelect(e, 'file1-info', 'hex1', 1);
+        });
+        
+        document.getElementById('file2').addEventListener('change', function(e) {
+            handleFileSelect(e, 'file2-info', 'hex2', 2);
+        });
+
+        // 获取两个hex-box元素
+        const hex1Box = document.getElementById('hex1');
+        const hex2Box = document.getElementById('hex2');
+
+        // 添加滚动事件监听器
+        hex1Box.addEventListener('scroll', function() {
+            syncScroll(this, hex2Box);
+        });
+
+        hex2Box.addEventListener('scroll', function() {
+            syncScroll(this, hex1Box);
+        });
+
+        function syncScroll(scrolledElement, targetElement) {
+            if (isScrolling) return;
+            
+            isScrolling = true;
+            
+            // 计算滚动比例
+            const scrollRatio = scrolledElement.scrollTop / (scrolledElement.scrollHeight - scrolledElement.clientHeight);
+            
+            // 应用相同的滚动比例到目标元素
+            const targetScroll = scrollRatio * (targetElement.scrollHeight - targetElement.clientHeight);
+            targetElement.scrollTop = targetScroll;
+            
+            // 使用setTimeout来避免递归调用
+            setTimeout(() => {
+                isScrolling = false;
+            }, 10);
+        }
+
+        function handleFileSelect(event, infoId, hexId, fileNum) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // 更新文件信息
+            document.getElementById(infoId).textContent = 
+                `文件名: ${file.name}, 大小: ${formatFileSize(file.size)}`;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const arrayBuffer = e.target.result;
+                const uint8Array = new Uint8Array(arrayBuffer);
+                
+                if (fileNum === 1) {
+                    file1Data = uint8Array;
+                } else {
+                    file2Data = uint8Array;
+                }
+                
+                updateHexDisplay();
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function updateHexDisplay() {
+            if (file1Data) {
+                const hexString1 = arrayToHexString(file1Data, file2Data, 1);
+                document.getElementById('hex1').innerHTML = hexString1;
+            }
+            
+            if (file2Data) {
+                const hexString2 = arrayToHexString(file2Data, file1Data, 2);
+                document.getElementById('hex2').innerHTML = hexString2;
+            }
+        }
+
+        function arrayToHexString(mainArray, compareArray, fileNum) {
+            let hexStr = '';
+            const bytesPerLine = 16;
+            
+            for (let i = 0; i < mainArray.length; i++) {
+                const hex = mainArray[i].toString(16).toUpperCase().padStart(2, '0');
+                
+                // 检查是否需要标记差异
+                let isDiff = false;
+                if (compareArray && i < compareArray.length) {
+                    isDiff = mainArray[i] !== compareArray[i];
+                } else if (compareArray) {
+                    // 如果比较数组比主数组短，多出的部分也算差异
+                    isDiff = true;
+                }
+                
+                // 如果是另一个文件比当前文件长，当前文件不需要处理（会在另一个文件中标记）
+                if (fileNum === 1 && compareArray && i >= compareArray.length) {
+                    isDiff = false;
+                } else if (fileNum === 2 && compareArray && i >= compareArray.length) {
+                    isDiff = true;
+                }
+                
+                if (isDiff) {
+                    hexStr += `<span class="diff">${hex}</span> `;
+                } else {
+                    hexStr += `${hex} `;
+                }
+                
+            }
+            
+            // 处理比较数组比主数组长的情况（仅对文件2有效）
+            if (fileNum === 2 && compareArray && compareArray.length > mainArray.length) {
+                for (let i = mainArray.length; i < compareArray.length; i++) {
+                    const hex = compareArray[i].toString(16).toUpperCase().padStart(2, '0');
+                    hexStr += `<span class="diff">${hex}</span> `;
+                }
+            }
+            
+            return hexStr;
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+    </script>
+</body>
+</html>
