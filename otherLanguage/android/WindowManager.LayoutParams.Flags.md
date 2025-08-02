@@ -16,7 +16,7 @@
 
 4. `FLAG_TOUCHABLE_WHEN_WAKING` (64)
     - 设备唤醒时窗口可触摸
-    - 已启用。Android 5.0+ 使用 `FLAG_DISMISS_KEYGUARD` 代替
+    - 已弃用。Android 5.0+ 使用 `FLAG_DISMISS_KEYGUARD` 代替
 
 ## 窗口显示特性类
 
