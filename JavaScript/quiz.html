@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JavaScript极限挑战 - 高阶概念综合题（修正版）</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'SF Pro Display', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: #e0e0e0;
+            line-height: 1.7;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(25, 25, 35, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            border: 1px solid #444;
+        }
+        
+        header {
+            background: linear-gradient(90deg, #0f0c29, #302b63, #0f0c29);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(120, 119, 198, 0.3) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(255, 119, 198, 0.2) 0%, transparent 50%);
+        }
+        
+        h1 {
+            font-size: 3.2rem;
+            margin-bottom: 15px;
+            text-shadow: 0 0 20px rgba(120, 119, 198, 0.7);
+            position: relative;
+            letter-spacing: 1px;
+        }
+        
+        .subtitle {
+            font-size: 1.4rem;
+            opacity: 0.9;
+            position: relative;
+            color: #b8b5ff;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .question {
+            background: rgba(40, 40, 60, 0.8);
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid #555;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .question::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #ff6b6b, #ffd93d, #6bcf7f, #4d96ff);
+        }
+        
+        .question:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            background: rgba(45, 45, 65, 0.9);
+        }
+        
+        .question-title {
+            font-size: 1.6rem;
+            color: #ffd93d;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        
+        .question-title i {
+            margin-right: 15px;
+            font-size: 1.8rem;
+        }
+        
+        .question-content {
+            background: rgba(20, 20, 30, 0.9);
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            font-family: 'Fira Code', 'Consolas', monospace;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            border: 1px solid #555;
+            color: #f0f0f0;
+            position: relative;
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .question-content::before {
+            content: '代码';
+            position: absolute;
+            top: 0;
+            right: 0;
+            background: #6bcf7f;
+            color: #1a1a2e;
+            padding: 5px 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            border-radius: 0 0 0 8px;
+        }
+        
+        .answer-btn {
+            background: linear-gradient(90deg, #ff6b6b, #ff8e8e);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.05rem;
+            transition: all 0.3s;
+            font-weight: 600;
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .answer-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .answer-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.6);
+        }
+        
+        .answer-btn:hover::before {
+            left: 100%;
+        }
+        
+        .answer {
+            background: rgba(30, 30, 50, 0.9);
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 25px;
+            display: none;
+            border: 1px solid #6bcf7f;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        .answer::before {
+            content: '答案与深度解析';
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: #6bcf7f;
+            color: #1a1a2e;
+            padding: 5px 15px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            border-radius: 0 0 8px 0;
+        }
+        
+        .answer.show {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .hint {
+            background: rgba(255, 243, 205, 0.1);
+            border-left: 4px solid #ffd93d;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 0 8px 8px 0;
+            font-size: 1rem;
+            position: relative;
+            color: #ffd93d;
+        }
+        
+        .hint::before {
+            content: '💡 深度洞察';
+            margin-right: 8px;
+            font-weight: bold;
+        }
+        
+        .difficulty {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            background: linear-gradient(90deg, #ff6b6b, #ff8e8e);
+            color: #1a1a2e;
+            padding: 8px 20px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            box-shadow: 0 4px 10px rgba(255, 107, 107, 0.4);
+        }
+        
+        .concept-tags {
+            display: flex;
+            flex-wrap: wrap;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        
+        .tag {
+            background: rgba(77, 150, 255, 0.2);
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            color: #4d96ff;
+            border: 1px solid #4d96ff;
+        }
+        
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #888;
+            font-size: 1rem;
+            border-top: 1px solid #444;
+            background: rgba(20, 20, 30, 0.8);
+        }
+        
+        .output-section {
+            background: rgba(10, 10, 20, 0.9);
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-family: 'Fira Code', monospace;
+            border: 1px solid #444;
+        }
+        
+        .output-title {
+            color: #6bcf7f;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+        
+        .complexity-note {
+            background: rgba(255, 107, 107, 0.1);
+            border-left: 4px solid #ff6b6b;
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.95rem;
+            color: #ff8e8e;
+        }
+        
+        .error {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .content {
+                padding: 25px;
+            }
+            
+            .question {
+                padding: 25px;
+            }
+            
+            .question-content {
+                padding: 20px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>JavaScript极限挑战</h1>
+            <p class="subtitle">高阶概念深度综合题 - 修正版</p>
+        </header>
+        
+        <div class="content">
+            <div class="question">
+                <div class="question-title">
+                    <i>🚀</i> 题目一：多层IIFE与闭包的极限嵌套
+                </div>
+                <div class="difficulty">地狱难度</div>
+                <div class="question-content">
+var a = 1;
+
+var result = (function(x) {
+  return function(y) {
+    var a = 2;
+    return (function(z) {
+      return function(w) {
+        return a + x + y + z + w;
+      };
+    })(y * 2);
+  };
+})(a * 3)(a * 4);
+
+console.log(result(5));</div>
+                <div class="concept-tags">
+                    <div class="tag">多层IIFE</div>
+                    <div class="tag">闭包嵌套</div>
+                    <div class="tag">作用域链</div>
+                    <div class="tag">变量屏蔽</div>
+                </div>
+                <button class="answer-btn">显示答案与解析</button>
+                <div class="answer">
+                    <p><strong>输出结果：</strong></p>
+                    <div class="output-section">
+                        <div class="output-title">控制台输出:</div>
+                        <pre>18</pre>
+                    </div>
+                    <p><strong>深度解析：</strong></p>
+                    <p>这个题目展示了极其复杂的多层IIFE与闭包嵌套：</p>
+                    <ol>
+                        <li>全局变量 a = 1</li>
+                        <li>第一层IIFE：参数 x = a * 3 = 3</li>
+                        <li>返回一个函数，接受参数 y = a * 4 = 4</li>
+                        <li>在返回的函数内部：var a = 2（屏蔽了全局的a）</li>
+                        <li>第二层IIFE：参数 z = y * 2 = 8</li>
+                        <li>返回一个函数，接受参数 w = 5</li>
+                        <li>最终计算：a(2) + x(3) + y(4) + z(8) + w(5) = 2 + 3 + 4 + 8 + 5 = 22</li>
+                    </ol>
+                    <div class="complexity-note">
+                        <strong>注意：</strong> 这里有一个关键点 - 在计算y时使用的是全局的a(1)，而不是内部声明的a(2)，因为参数传递发生在函数内部变量声明之前。
+                    </div>
+                    <div class="hint">
+                        实际上，由于JavaScript的函数作用域和变量提升机制，内部var a = 2的声明会提升到函数顶部，但赋值发生在原地。参数y的计算发生在函数执行时，此时内部a的赋值还未发生，所以y = a * 4 = 1 * 4 = 4。
+                    </div>
+                </div>
+            </div>
+            
+            <div class="question">
+                <div class="question-title">
+                    <i>🚀</i> 题目二：异步IIFE与事件循环的复杂交互
+                </div>
+                <div class="difficulty">地狱难度</div>
+                <div class="question-content">
+console.log('1');
+
+setTimeout(function() {
+  console.log('2');
+  
+  (function() {
+    console.log('3');
+    setTimeout(function() {
+      console.log('4');
+    }, 0);
+  })();
+  
+  console.log('5');
+}, 0);
+
+Promise.resolve().then(function() {
+  console.log('6');
+  
+  (function() {
+    console.log('7');
+    Promise.resolve().then(function() {
+      console.log('8');
+    });
+  })();
+  
+  console.log('9');
+});
+
+console.log('10');</div>
+                <div class="concept-tags">
+                    <div class="tag">IIFE与异步</div>
+                    <div class="tag">事件循环</div>
+                    <div class="tag">Promise</div>
+                    <div class="tag">setTimeout</div>
+                    <div class="tag">微任务/宏任务</div>
+                </div>
+                <button class="answer-btn">显示答案与解析</button>
+                <div class="answer">
+                    <p><strong>输出结果：</strong></p>
+                    <div class="output-section">
+                        <div class="output-title">控制台输出:</div>
+                        <pre>1
+10
+6
+7
+9
+8
+2
+3
+5
+4</pre>
+                    </div>
+                    <p><strong>深度解析：</strong></p>
+                    <p>这个题目结合了IIFE与JavaScript事件循环的复杂机制：</p>
+                    <ol>
+                        <li>同步代码执行：输出1、10</li>
+                        <li>微任务队列（Promise.then）优先于宏任务队列（setTimeout）执行</li>
+                        <li>Promise.then中的IIFE立即执行，输出6、7、9</li>
+                        <li>IIFE内部的Promise.then创建新的微任务，输出8</li>
+                        <li>然后执行宏任务队列中的setTimeout，输出2</li>
+                        <li>setTimeout中的IIFE立即执行，输出3、5</li>
+                        <li>IIFE内部的setTimeout创建新的宏任务，最后输出4</li>
+                    </ol>
+                    <div class="hint">
+                        JavaScript事件循环机制：同步任务 > 微任务(Promise) > 宏任务(setTimeout)。IIFE会立即执行，不影响任务队列的分类。
+                    </div>
+                </div>
+            </div>
+            
+            <div class="question">
+                <div class="question-title">
+                    <i>🚀</i> 题目三：预编译与IIFE的极限挑战（修正版）
+                </div>
+                <div class="difficulty">地狱难度</div>
+                <div class="question-content">
+console.log(a);
+console.log(b);
+
+var a = 1;
+
+if (true) {
+  console.log(a);
+  console.log(b);
+  
+  var b = 2;
+  
+  (function() {
+    console.log(a);
+    console.log(b);
+    console.log(c);
+    
+    var c = 3;
+    a = 4;
+    
+    console.log(a);
+    console.log(b);
+    console.log(c);
+  })();
+  
+  console.log(a);
+  console.log(b);
+  try {
+    console.log(c);
+  } catch (e) {
+    console.log('Error: ' + e.message);
+  }
+}
+
+console.log(a);
+console.log(b);
+try {
+  console.log(c);
+} catch (e) {
+  console.log('Error: ' + e.message);
+}</div>
+                <div class="concept-tags">
+                    <div class="tag">预编译</div>
+                    <div class="tag">IIFE</div>
+                    <div class="tag">变量提升</div>
+                    <div class="tag">作用域链</div>
+                    <div class="tag">块级作用域</div>
+                </div>
+                <button class="answer-btn">显示答案与解析</button>
+                <div class="answer">
+                    <p><strong>输出结果：</strong></p>
+                    <div class="output-section">
+                        <div class="output-title">控制台输出:</div>
+                        <pre>undefined
+undefined
+1
+undefined
+1
+2
+undefined
+4
+2
+3
+4
+2
+Error: c is not defined
+4
+2
+Error: c is not defined</pre>
+                    </div>
+                    <p><strong>深度解析：</strong></p>
+                    <p>这个题目深度结合了预编译、变量提升、IIFE和作用域链：</p>
+                    <ol>
+                        <li>预编译阶段：全局变量a、b声明提升，初始值为undefined</li>
+                        <li>前两个console.log输出undefined、undefined</li>
+                        <li>a赋值为1</li>
+                        <li>if块内：输出a(1)、b(undefined)</li>
+                        <li>b赋值为2</li>
+                        <li>IIFE内部有自己的作用域，c声明提升，输出a(1)、b(2)、c(undefined)</li>
+                        <li>IIFE内部c赋值为3，a赋值为4（修改的是全局a）</li>
+                        <li>IIFE内部输出a(4)、b(2)、c(3)</li>
+                        <li>IIFE外部输出a(4)、b(2)，尝试访问c会报错（因为c是IIFE的局部变量）</li>
+                        <li>全局输出a(4)、b(2)，尝试访问c会报错</li>
+                    </ol>
+                    <div class="hint">
+                        关键点：var没有块级作用域，if块内的b实际是全局变量。IIFE创建了函数作用域，内部的var c是局部变量，外部无法访问。修正了之前版本中关于c的错误。
+                    </div>
+                </div>
+            </div>
+            
+            <div class="question">
+                <div class="question-title">
+                    <i>🚀</i> 题目四：闭包与IIFE的模块化极限设计
+                </div>
+                <div class="difficulty">地狱难度</div>
+                <div class="question-content">
+var Module = (function() {
+  var data = [];
+  var id = 0;
+  
+  function privateHelper(x) {
+    return x * 2 + id;
+  }
+  
+  var api = {
+    add: function(item) {
+      data.push({
+        id: ++id,
+        value: privateHelper(item)
+      });
+      return this;
+    },
+    remove: function(itemId) {
+      data = data.filter(function(item) {
+        return item.id !== itemId;
+      });
+      return this;
+    },
+    get: function() {
+      return data.slice();
+    },
+    process: (function() {
+      var counter = 0;
+      
+      return function() {
+        return data.map(function(item) {
+          return {
+            original: item.value,
+            processed: item.value + counter++
+          };
+        });
+      };
+    })()
+  };
+  
+  return api;
+})();
+
+Module.add(10).add(20).add(30);
+console.log(Module.get());
+Module.remove(2);
+console.log(Module.get());
+console.log(Module.process());
+console.log(Module.process());</div>
+                <div class="concept-tags">
+                    <div class="tag">IIFE模块模式</div>
+                    <div class="tag">闭包</div>
+                    <div class="tag">链式调用</div>
+                    <div class="tag">私有状态</div>
+                    <div class="tag">函数工厂</div>
+                </div>
+                <button class="answer-btn">显示答案与解析</button>
+                <div class="answer">
+                    <p><strong>输出结果：</strong></p>
+                    <div class="output-section">
+                        <div class="output-title">控制台输出:</div>
+                        <pre>[
+  { id: 1, value: 21 },
+  { id: 2, value: 42 },
+  { id: 3, value: 63 }
+]
+[
+  { id: 1, value: 21 },
+  { id: 3, value: 63 }
+]
+[
+  { original: 21, processed: 21 },
+  { original: 63, processed: 64 }
+]
+[
+  { original: 21, processed: 21 },
+  { original: 63, processed: 64 }
+]</pre>
+                    </div>
+                    <p><strong>深度解析：</strong></p>
+                    <p>这个题目展示了一个复杂的IIFE模块设计：</p>
+                    <ol>
+                        <li>Module是一个立即执行的IIFE，返回一个API对象</li>
+                        <li>data和id是私有变量，通过闭包保持状态</li>
+                        <li>privateHelper是私有函数</li>
+                        <li>add方法使用链式调用设计，每次添加时id自增</li>
+                        <li>process方法本身是一个IIFE，返回一个闭包函数，内部counter保持状态</li>
+                        <li>第一次调用process时，counter从0开始，但注意counter++是先使用后自增</li>
+                        <li>第二次调用process时，counter保持之前的值，但由于map函数中counter++的使用方式，结果与第一次相同</li>
+                    </ol>
+                    <div class="hint">
+                        这是一个高级模块模式的实际应用，结合了IIFE、闭包、链式调用和函数工厂等多种设计模式。process方法中的counter状态被闭包保持，但由于在map中使用counter++的方式，导致每次调用的结果相同。
+                    </div>
+                </div>
+            </div>
+            
+            <div class="question">
+                <div class="question-title">
+                    <i>🚀</i> 题目五：综合极限挑战 - 所有概念的终极融合
+                </div>
+                <div class="difficulty">终极挑战</div>
+                <div class="question-content">
+var x = 10;
+
+function outer() {
+  var x = 20;
+  
+  return (function() {
+    var x = 30;
+    
+    return {
+      getX: function() { return x; },
+      setX: function(val) { x = val; },
+      getOuterX: function() { return outer.x; },
+      getGlobalX: function() { return this.x; }.bind(this)
+    };
+  })();
+}
+
+var obj1 = outer();
+var obj2 = outer();
+
+console.log(obj1.getX());
+console.log(obj2.getX());
+
+obj1.setX(40);
+
+console.log(obj1.getX());
+console.log(obj2.getX());
+
+console.log(obj1.getOuterX());
+console.log(obj1.getGlobalX());
+
+obj1.getGlobalX = obj1.getGlobalX.bind({x: 50});
+console.log(obj1.getGlobalX());</div>
+                <div class="concept-tags">
+                    <div class="tag">IIFE</div>
+                    <div class="tag">闭包</div>
+                    <div class="tag">作用域链</div>
+                    <div class="tag">this绑定</div>
+                    <div class="tag">对象方法</div>
+                    <div class="tag">变量屏蔽</div>
+                </div>
+                <button class="answer-btn">显示答案与解析</button>
+                <div class="answer">
+                    <p><strong>输出结果：</strong></p>
+                    <div class="output-section">
+                        <div class="output-title">控制台输出:</div>
+                        <pre>30
+30
+40
+30
+undefined
+10
+50</pre>
+                    </div>
+                    <p><strong>深度解析：</strong></p>
+                    <p>这是所有概念的终极融合：</p>
+                    <ol>
+                        <li>全局x = 10</li>
+                        <li>outer函数内部x = 20</li>
+                        <li>IIFE内部x = 30，返回一个对象</li>
+                        <li>obj1和obj2是两个独立的闭包实例，各自有独立的x</li>
+                        <li>初始时obj1和obj2的getX都返回30</li>
+                        <li>obj1.setX(40)只修改obj1闭包中的x，obj2保持不变</li>
+                        <li>getOuterX试图访问outer.x，但outer没有x属性，返回undefined</li>
+                        <li>getGlobalX使用bind(this)，此处的this是IIFE的执行上下文（非严格模式下是window），返回全局x=10</li>
+                        <li>最后重新绑定getGlobalX的this为{x:50}，返回50</li>
+                    </ol>
+                    <div class="hint">
+                        这个题目展示了JavaScript中闭包、IIFE、this绑定和作用域链的极限交互。关键理解点：每个outer()调用都创建新的IIFE实例和闭包；this绑定的动态性；函数作用域与对象属性的区别。
+                    </div>
+                </div>
+            </div>
+            
+            <div class="question">
+                <div class="question-title">
+                    <i>🚀</i> 题目六：极限递归与IIFE的复杂交互
+                </div>
+                <div class="difficulty">终极挑战</div>
+                <div class="question-content">
+var result = (function f(n) {
+  return n > 1 ? n * f(n - 1) : 1;
+})(5);
+
+console.log(result);
+
+var factorial = (function() {
+  var cache = {};
+  
+  return function(n) {
+    if (n in cache) {
+      console.log('From cache:', n);
+      return cache[n];
+    }
+    
+    if (n <= 1) {
+      return 1;
+    }
+    
+    var result = n * factorial(n - 1);
+    cache[n] = result;
+    console.log('Calculated:', n);
+    return result;
+  };
+})();
+
+console.log(factorial(4));
+console.log(factorial(5));</div>
+                <div class="concept-tags">
+                    <div class="tag">IIFE递归</div>
+                    <div class="tag">闭包缓存</div>
+                    <div class="tag">记忆化</div>
+                    <div class="tag">递归优化</div>
+                </div>
+                <button class="answer-btn">显示答案与解析</button>
+                <div class="answer">
+                    <p><strong>输出结果：</strong></p>
+                    <div class="output-section">
+                        <div class="output-title">控制台输出:</div>
+                        <pre>120
+Calculated: 1
+Calculated: 2
+Calculated: 3
+Calculated: 4
+24
+From cache: 4
+Calculated: 5
+120</pre>
+                    </div>
+                    <p><strong>深度解析：</strong></p>
+                    <p>这个题目展示了IIFE与递归的复杂交互：</p>
+                    <ol>
+                        <li>第一个IIFE是递归计算阶乘的立即执行版本，计算5! = 120</li>
+                        <li>第二个是带缓存的阶乘函数，使用闭包保存cache对象</li>
+                        <li>第一次计算factorial(4)时，需要计算所有中间结果</li>
+                        <li>第二次计算factorial(5)时，4的结果已经在缓存中，只需计算5*24</li>
+                    </ol>
+                    <div class="hint">
+                        这是一个记忆化(memoization)的实际应用，通过IIFE和闭包实现函数结果的缓存，可以大幅优化递归函数的性能，避免重复计算。
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <footer>
+            <p>JavaScript极限挑战 - 高阶概念深度综合题（修正版） &copy; 2023</p>
+            <p style="margin-top: 10px; font-size: 0.9rem; color: #666;">感谢指正，题目3已修复c的作用域问题</p>
+        </footer>
+    </div>
+
+    <script>
+        // 添加显示/隐藏答案的功能
+        document.querySelectorAll('.answer-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const answer = this.nextElementSibling;
+                answer.classList.toggle('show');
+                this.textContent = answer.classList.contains('show') ? '隐藏答案与解析' : '显示答案与解析';
+                
+                // 添加滚动动画
+                if (answer.classList.contains('show')) {
+                    answer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            });
+        });
+        
+        // 添加高级交互效果
+        document.querySelectorAll('.question').forEach(question => {
+            // 鼠标悬停效果
+            question.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-10px) scale(1.01)';
+                this.style.zIndex = '10';
+            });
+            
+            question.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+                this.style.zIndex = '1';
+            });
+            
+            // 点击题目内容可以折叠/展开
+            const title = question.querySelector('.question-title');
+            title.style.cursor = 'pointer';
+            title.addEventListener('click', function() {
+                const content = this.parentNode.querySelector('.question-content');
+                const isHidden = content.style.display === 'none';
+                content.style.display = isHidden ? 'block' : 'none';
+            });
+        });
+    </script>
+
+</body>
+</html>

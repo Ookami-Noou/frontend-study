@@ -15,6 +15,7 @@
     <iframe name="myframe" src="https://fanyi.baidu.com/mtpe-individual/multimodal/"></iframe>
     ```
 
+***
 # 资源嵌入元素
 ## object
 用于在页面中显示一个资源
@@ -46,6 +47,7 @@
 ```
 这样如果成功解析了`object`，`embed`元素将无法被嵌入（因为`embed`元素**不能**作为`object`的子元素）；如果无法解析`object`元素，则会按行解析到`embed`元素
 
+***
 # 表单元素
 主要用于收集用户数据的一系列元素
 
@@ -82,8 +84,105 @@
 ## select
 表示下拉列表选择框。通常与 `option` 元素配合使用
 
+ - **multiple**: 布尔属性。允许多选
+
 ### option
 下拉列表的选项
 
 ### optgroup
 下拉列表的分组
+
+## textarea
+文本域/多行文本框。
+可替换元素，但是显示的内容需要写在元素内部
+
+ - **cols**: 列数。表示横向上多少文字
+ - **rows**: 行数。纵向上显示多少行
+ - **placeholder**: 无内容时的提示文本
+
+## 按钮元素 button
+
+ - **type**: 通常包含三种：
+     - **reset**
+     - **submit**：默认值
+     - **button**
+
+***
+
+# 与表单元素配合的元素
+## label
+通常配合单选/多选框使用
+
+ - 显式关联：使用**for**属性显式关联特定id的表单元素
+     ```html
+        <input name="gender" type="radio" id="male">
+        <label for="male">男</label>
+     ```
+ - 隐式关联：将需要关联的内容写在label标签内部
+     ```html
+        <label>
+            <input name="gender" type="radio">女
+        </label>
+     ```
+
+## datalist
+数据列表。该元素本身不会显示在页面上。通常用于和普通文本框配合使用。
+自身定义**id**属性，通过**input**元素的**list**属性与之绑定，随后用户在输入时会根据输入的内容给出提示。
+
+```html
+<p>
+    请输入你喜欢的语言：
+    <input type="text" list="lang">
+    <datalist id="lang">
+        <option value="fontend">HTML+CSS+JavaScript</option>
+        <option value="java">Java</option>
+        <option value="cplusplus">C++</option>
+    </datalist>
+</p>
+```
+
+## form
+通常情况下会将整个表单元素放置到form元素内部，当提交表单时会将form表单内部所有表单元素的内容以合适的方式提交到服务器
+
+ - **action**：提交地址。默认提交至当前页面。
+ - **method**: 提交方式。通常为 `GET` 或 `POST`
+
+form表单中的数据相关内容需要添加 `name` 属性
+
+## fieldset
+表单分组。将部分表单内容作为一个分组分开显示。
+
+```html
+<fieldset>
+    <legend>修改密码</legend>
+    <p>
+        账号：
+        <input type="text" readonly>
+    </p>
+    <p>
+        密码：
+        <input type="password">
+    </p>
+    <p>
+        新密码：
+        <input type="password">
+    </p>
+    <p>
+        新密码确认：
+        <input type="password">
+    </p>
+</fieldset>
+```
+
+***
+# 表单状态
+ - **readonly**: 布尔属性，表示是否只读。不会改变表单显示样式
+ - **disabled**: 布尔属性，表示是否禁用。会改变表单显示样式
+
+***
+
+# 美化表单元素
+
+## 新的伪类
+
+1. **focus**：元素聚焦时

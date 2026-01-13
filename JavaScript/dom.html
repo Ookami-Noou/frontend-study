@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="cmn-hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .blocks {
+            display: flex;
+            flex-direction: row;
+            width: 100vw;
+            height: auto;
+        }
+        .blocks > div {
+            width: 100px;
+            height: 100px;
+            padding: unset;
+            margin: unset;
+        }
+        .blocks > .b1 {
+            background-color: aqua;
+        }
+        .blocks > .b2 {
+            background-color: red;
+        }
+        .blocks > .b3 {
+            background-color: greenyellow;
+        }
+        .blocks > .b4 {
+            background-color: pink;
+        }
+        .blocks > .b5 {
+            background-color: chocolate;
+        }
+        .blocks > .b6 {
+            background-color: blue;
+        }
+        .blocks > .b8 {
+            background-color: skyblue;
+        }
+        .blocks > .b7 {
+            background-color: purple;
+        }
+
+    </style>
+
+    <style>
+        .timer input {
+            border: 1px solid #00000088;
+            font-size: 20px;
+            text-align: center;
+        }
+        .timer span {
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <div class="p1">
+        <div class="p2"><span></span><em>1</em></div>
+        <div class="p2"><span></span><em>2</em></div>
+        <div class="p2"><span></span><em>3</em></div>
+    </div>
+    <div class="blocks">
+        <div class="b1"></div>
+        <div class="b2"></div>
+        <div class="b3"></div>
+        <div class="b4"></div>
+        <div class="b5"></div>
+    </div>
+    <span>4</span>
+
+    <script>
+        Object.prototype.apply = function (operator, ...arg) {
+            typeof operator === 'function' && operator.call(this, ...arg);
+            return this;
+        }
+    </script>
+
+    <script>
+        var ps = document.getElementsByClassName("p2");
+        var ems = document.getElementsByTagName("em");
+
+
+        // 1. 遍历元素节点数
+        Element.prototype.forEach = function (callback) {
+            if (typeof callback !== 'function') callback = (elem) => console.log(elem);
+            if (this.nodeType == 1) {
+                callback(this);
+            }
+            var len = this.childNodes.length;
+            for (let i = 0; i < len; i++) {
+                if (this.childNodes[i].nodeType == 1) {
+                    Element.prototype.forEach.call(this.childNodes[i])
+                }
+            }
+        }
+
+        // 2. 封装函数，返回元素e的第n层祖先元素节点
+        Element.prototype.ancestor = function (n) {
+            n = +n || 1;
+            var me = this;
+            for (; n > 0; n--) {
+                if (me.parentNode == null || me.parentNode.nodeType !== 1) return null;
+                me = me.parentNode;
+            }
+            return me;
+        }
+
+        // 3. 封装函数，返回元素e的第n个兄弟元素节点。n为正返回后面的；n为负返回前面的；n为0返回自己
+        Element.prototype.brother = function (n) {
+            n = +n || 0;
+            if (n === 0) return this;
+            var me = this;
+            var next = !(n < 0 && (n *= -1));
+            while (n-- > 0) {
+                let target = next ? me.nextSibling : me.previousSibling;
+                while (target != null && target.nodeType !== 1) {
+                    target = next ? me.nextSibling : me.previousSibling;
+                }
+                if (target == null) return null;
+                me = target;
+            }
+            return me;
+        }
+
+        // 4. 封装函数，封装 MyChildren 功能，解决以前部分浏览器的兼容性问题
+        Element.prototype.myChildren = function () {
+            var res = {
+                length : 0,
+                push : Array.prototype.push,
+            }
+            var childCollection = this.childNodes,
+                len = this.childNodes.length;
+            for (let i = 0; i < len; i++) {
+                if (childCollection[i].nodeType === 1) {
+                    res.push(childCollection[i]);
+                }
+            }
+            delete res.push;
+            return res;
+        }
+
+        // 5. 封装自己的 hasChildren() 方法，不可用 children 属性
+        Element.prototype.hasChildren = function () {
+            var childCollection = this.childNodes;
+            for (let i = 0; i < childCollection.length; i++) {
+                if (childCollection[i].nodeType === 1) return true;
+            }
+            return false;
+        }
+
+    </script>
+
+    <script>
+        (() => {
+            var div = document.createElement("div");
+            var p = document.createElement("p");
+            div.setAttribute("class", "example");
+            p.setAttribute("class", "slogan");
+            var text = document.createTextNode("lorem.");
+            p.appendChild(text);
+            div.appendChild(p);
+            document.body.appendChild(div);
+        })();
+
+        var blocks = (() => {
+            var tmp = document.getElementsByTagName("div");
+            for (let i = 0; i < tmp.length; i++) {
+                if (tmp[i].getAttribute("class") == "blocks") return tmp[i];
+            }
+            throw new Error("dov.blocks is missing");
+        })();
+        var b1 = document.querySelector("div.b1");
+        var b2 = document.querySelector("div.b2");
+        var b3 = document.querySelector("div.b3");
+        var b4 = document.querySelector("div.b4");
+        var b5 = document.querySelector("div.b5");
+        var b6 = document.createElement("div").apply(function () {
+            this.className = "b6";
+        })
+        var b7 = document.createElement("div").apply(function () { 
+            this.className = "b7";
+        })
+        
+        var b8 = document.createElement("div").apply(function () { 
+            this.className = "b8";
+        })
+        
+
+        // 1. 封装函数 insertAfter()，功能类似 insertBefore
+        Element.prototype.insertAfter = function (newNode, afterWho) {
+            var myChildren = this.childNodes, 
+                len = myChildren.length;
+            for (let i = 0; i < len; i++) {
+                if (myChildren[i] == afterWho) {
+                    if (i == len - 1) {
+                        this.appendChild(newNode);
+                    } else {
+                        this.insertBefore(newNode, myChildren[i + 1])
+                    }
+                    return newNode;
+                }
+            }
+            throw new Error("The node after which the new node is to be inserted is not a child of this node.")
+        }
+
+        // 2. 将目标节点内部的节点顺序逆序
+        Element.prototype.reverseChildren = function () {
+            var oldChildren = [];
+            var myChildren = this.childNodes, 
+                len = myChildren.length;
+            for (let i = len; --i >= 0; ) {
+                oldChildren.push(this.removeChild(myChildren[i]));
+            }
+            for (let i = 0; i < oldChildren.length; i++) {
+                this.appendChild(oldChildren[i]);
+            }
+        }
+
+    </script>
+
+    <div class="timer">
+        <span>minutes</span><input id="min" type="text" value="0"><br>
+        <span>seconds</span><input id="sec" type="text" value="0">
+    </div>
+
+    <script>
+        var minInput = document.getElementById("min");
+        var secInput = document.getElementById("sec");
+        var timersTimer = setInterval(function () {
+            var sec = (+secInput.getAttribute("value") + 1) || 0;
+            if (sec >= 60) {
+                minInput.setAttribute("value", (+minInput.getAttribute("value") + ((sec / 60) >> 0)) || 0);
+            }
+            secInput.setAttribute("value", (sec % 60) || 0);
+        }, 1000);
+    </script>
+
+
+
+</body>
+</html>

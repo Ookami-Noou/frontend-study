@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="cmn-hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+
+    <script type="text/javascript">
+        function fun1(n) {
+            if (n !== (n >> 0)) {
+                throw new Error("n must be an integer");
+            }
+            let negative = n < 0 && (n *= -1);
+            let sum = 1;
+            for (let i = 0; i < n; i++) {
+                sum *= 2;
+            }
+            return negative ? (1 / sum) : sum
+        }
+
+        function fun2(n) {
+            if (n !== (n >> 0) || n < 0) {
+                throw new Error("n must be a positive integer");
+            }
+            let res = 1;
+            while (n) {
+                res *= n--;
+            }
+            return res;
+        }
+
+        let fbnq = [0, 1, 1];
+        function fun3(n) {
+            if (n !== (n >> 0) || n < 0) {
+                throw new Error("n must be a positive integer");
+            }
+            if (n >= 79) {
+                throw new Error("result will be out of safe number range")
+            }
+            return fbnq[n] || calcFbnq(n);
+        }
+
+        function calcFbnq(n) {
+            for (let i = fbnq.length; i <= n; i++) {
+                fbnq[i] = fbnq[i - 1] + fbnq[i - 2];
+            }
+            return fbnq[n];
+        }
+
+        function fun4(n) {
+            if (n !== (n >> 0) || n < 100 || n > 999) {
+                throw new Error("n must be a positive integer in range 100..999");
+            }
+            return (n % 10 * 100) + ((n % 100 / 10) >> 0) * 10 + ((n / 100) >> 0)
+        }
+
+    </script>
+
+    <script type="text/javascript">
+        const kannjiMap = "零壹贰叁肆伍陆柒捌玖";
+        const zero = "零";
+        const jyuu = "拾";
+        const hakku = "佰";
+        const senn = "仟";
+        const elemUnit = `${senn}${hakku}${jyuu}`;
+        const mann = "萬";
+        const oku = "亿";
+        const connUnit = `${oku}${mann}`;
+
+        function slice(str) {
+            str = String(str);
+            let res = [];
+            let firstLength = str.length % 4;
+            for (let i = 0, j = firstLength; i < str.length && j <= str.length; i = j, j += 4) {
+                res.push(str.substring(i, j))
+            }
+            return res.filter((elem) => elem.length > 0);
+        }
+
+        /** input like '1234', out like '壹仟贰佰叁拾肆' */
+        function kannji(str) {
+            if (str.length > 4) throw new Error();
+            str = String(str).padStart(4, '0');
+            let res = "";
+            let i = 4 - str.length;
+            let zeroBefore = false;
+            for (; i < str.length && str[i] === '0'; i++);
+            for (; i < str.length; i++) {
+                if (zeroBefore && kannjiMap[str[i]] !== zero) {
+                    zeroBefore = false;
+                    res += zero;
+                }
+                if (kannjiMap[str[i]] === zero) {
+                    zeroBefore = true;
+                } else {
+                    res += kannjiMap[str[i]] + (elemUnit[i] ?? "");
+                }
+            }
+            return res;
+        }
+
+        function transfer(param) {
+            const str = String(+param);
+            if (str === '0') return zero;
+            if (str.length > 12) throw new Error();
+            if (isNaN(str) || str.includes('.') || str.includes('-')) throw new Error();
+            const sliced = slice(str);
+            console.log(sliced);
+            let res = "";
+            let connIndex = 3 - sliced.length;
+            for(let i = 0; i < sliced.length; i++) {
+                const part = kannji(sliced[i]);
+                if (part.length == 0) {
+                    connIndex++
+                    continue;
+                }
+                res += (sliced[i].startsWith('0') && sliced[i] !== '0000' ? zero : "") + part + (connUnit[connIndex++] ?? '');
+            }
+            return res;
+        }
+    </script>
+
+    
+    <script type="text/javascript">
+        const basicOrFunctionType = ["undefined", "number", "string", "function", "boolean"];
+
+        // 该函数不考虑如下情况：
+        //  - 弱引用等
+        //  - 部分特殊数据类型
+        function deepCopy(any) {
+            const cache = new Map();
+
+            function copy(arg) {
+                // 基本数据类型 和 函数类型，直接返回其本身
+                if (basicOrFunctionType.includes(typeof arg)) return arg;
+                // 如果是 Object 类型，判 null
+                if (arg === null) return arg;
+
+                // 如果是对象
+
+                // 如果缓存中存在，直接返回（避免因递归引用和自引用导致栈溢出）
+                if (cache.has(arg)) {
+                    return cache.get(arg);
+                }
+                let res = null;
+                switch (true) {
+                    case Array.isArray(arg):
+                    case Object.prototype.toString.call(arg).includes("Array"):
+                        // 如果是数组
+                        // 避免因对象的各种标记（如 arg.prototype.toString、[[toString]], class标记等）被覆盖，
+                        // 以及 父子域 的问题
+                        // 使用 Array.isArray 和 Object.prototype.toString.call 进行判断
+                        // 如果对象本身有效标记被修改并且 Object.prototype.toString 也被修改，那不管，放行
+                        res = [];
+                        cache.set(arg, res);
+                        // 考虑到稀松数组，将 res 的长度进行赋值以处理末尾存在 空元素 的情况
+                        // 仍使用 for-in 循环并判断是否是自身属性，因为 Array 也可能被附加其他非数组元素的属性
+                        res.length = arg.length;
+                        for (let idx in arg) {
+                            if (!arg.hasOwnProperty(idx)) continue;
+                            res[idx] = copy(arg[idx]);
+                        }
+                        return res;
+                    case arg instanceof Date: 
+                        res = new Date(arg);
+                        break;
+                    case arg instanceof Map: 
+                        res = new Map();
+                        arg.forEach(function (v, k) {
+                            res.set(copy(k), copy(v));
+                        });
+                        break;
+                    default:
+                        res = {};
+                        break;
+                }
+
+                // 只要是对象就可能被附加其他的属性。此时将其所有其他属性拷贝进去
+                cache.set(arg, res);
+                for (let prop in arg) {
+                    if (!arg.hasOwnProperty(prop)) continue;
+                    res[prop] = copy(arg[prop]);
+                }
+                return res;
+            }
+
+            return copy(any);
+        }
+        /** deepCopy 测试数据 */
+        var a = {
+            a : 123,
+            b : "234",
+            c : void 0,
+            d : null,
+            e : {
+                a : 111
+            },
+            f : [
+                123, 
+                null, 
+                [1, 2, 3, , , , , , 9, 10, , , ], 
+                {
+                    "prop" : function () { 
+                        console.log("Hello World!") 
+                    } 
+                } 
+            ],
+            g : new Date(),
+            h : new Map(),
+            j : {},
+        }
+        a.h.set({ a : 1 }, { b : 2 });
+        a.h.set(1, -1);
+        a.h.set(void 0, null);
+        a.i = a;
+        a.j.a = a.f;
+        a.f[4] = a.f;
+    </script>
+    
+
+    <script>
+        function type(any) {
+            if (basicOrFunctionType.includes(typeof any)) return typeof any;
+            if (any === null) return "null";
+            if (Array.isArray(any) || Object.prototype.toString.call(any) === "[object Array]") return "array";
+            if (any instanceof Number) return "number object";
+            if (any instanceof String) return "string object";
+            if (any instanceof Boolean) return "boolean object";
+            return "object";
+        }
+
+        Array.prototype.deduply = function () {
+            for (let i = this.length - 1; i >= 0; i--) {
+                if (this.slice(0, i).includes(this[i])) {
+                    this.splice(i, 1);
+                }
+            }
+            return this;
+        }
+
+        Array.prototype.unique = function () {
+            var arr = [];
+            for (let i = 0; i < this.length; arr.includes(this[i]) || arr.push(this[i]), i++);
+            return arr;
+        }
+    </script>
+
+    <script>
+        // 1. 一个字符串由 a-z 组成，找出第一个只出现一次的字母
+        function firstUniqueChar(arg) {
+            const str = String(arg);
+            const mapper = {};
+            const len = str.length;
+            for (let i = 0; i < len; i++) {
+                mapper[str[i]] = mapper[str[i]] + 1 || 1;
+            }
+            for (let prop in mapper) {
+                if (mapper[prop] === 1) return prop;
+            }
+            return '';
+        }
+
+        // 2. 字符串去重
+        String.prototype.unique = function () {
+            const mapper = {};
+            for (let i = 0; i < this.length; i++) {
+                mapper[this[i]] = 1;
+            }
+            let tmp = [];
+            for (let prop in mapper) {
+                tmp.push(prop);
+            }
+            return tmp.join('');
+        }
+    </script>
+
+    <script>
+        (function() {
+            "use strict";
+            console.log(arguments);
+            console.log(arguments.length)
+        }(1,2))
+
+    </script>
+</body>
+</html>

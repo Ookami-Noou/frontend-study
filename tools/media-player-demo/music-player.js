@@ -348,92 +348,23 @@ function getFileClass(filename) {
         suffix = lowerName.substr(lastDot);
     }
     switch (suffix) {
-        case '.mp3':
-        case '.wav':
-        case '.flac':
-        case '.aac':
-        case '.ogg':
-        case '.m4a':
-        case '.m4b':
-        case '.g711a':
+        case '.mp3': case '.wav': case '.flac': case '.aac': case '.ogg': case '.m4a':case '.m4b': case '.g711a':
         case '.g711u':
             return 'music';
-        case '.txt':
-        case '.md':
-        case '.csv':
-        case '.json':
-        case ".xml":
-        case '.html':
-        case '.css':
-        case '.js':
-        case '.lrc':
-        case '.java':
-        case '.py':
-        case '.go':
-        case '.ts':
-        case '.sass':
-        case '.scss':
-        case '.less':
-        case '.ini':
-        case '.dart':
-        case '.yaml':
-        case '.pom':
-        case '.gitignore':
-        case '.c':
-        case '.h':
-        case '.cpp':
-        case '.hpp':
-        case '.kt':
-        case '.kts':
-        case '.propertise':
-        case '.pro':
-        case '.log':
-        case '.doc':
-        case '.docx':
-        case '.xls':
-        case '.xlsx':
-        case '.pdf':
-        case '.gradle':
-        case '.swift':
-        case '.cs':
-        case '.odt':
-        case '.rtf':
-        case '.ods':
-        case '.odp':
-        case '.wxml':
-        case '.wxss':
-        case '.php':
-        case '.vue':
-        case '.jsp':
-        case '.sql':
+        case '.txt': case '.md':   case '.csv':  case '.json':       case ".xml":       case '.html': case '.css':  case '.js':
+        case '.lrc': case '.java': case '.py':   case '.go':         case '.ts':        case '.sass': case '.scss': case '.less':
+        case '.ini': case '.dart': case '.yaml': case '.pom':        case '.gitignore': case '.c':    case '.h':    case '.cpp':
+        case '.hpp': case '.kt':   case '.kts':  case '.propertise': case '.pro':       case '.log':  case '.doc':  case '.docx':
+        case '.xls': case '.xlsx': case '.pdf':  case '.gradle':     case '.swift':     case '.cs':   case '.odt':  case '.sql':
+        case '.rtf': case '.ods':  case '.odp':  case '.wxml':       case '.wxss':      case '.php':  case '.vue':  case '.jsp':
             return 'text';
-        case '.jpg':
-        case '.jpeg':
-        case '.png':
-        case '.gif':
-        case '.bmp':
-        case '.svg':
-        case '.webp':
-        case '.jfif':
+        case '.jpg': case '.jpeg': case '.png': case '.gif': case '.bmp': case '.svg': case '.webp': case '.jfif':
             return 'image';
-        case '.zip':
-        case '.rar':
-        case '.7z':
-        case '.tar':
-        case '.gz':
+        case '.zip': case '.rar': case '.7z': case '.tar': case '.gz':
             return 'archive';
-        case '.exe':
-        case '.bat':
-        case '.sh':
-        case '.msi':
-        case '.app':
-        case '.apk':
+        case '.exe': case '.bat': case '.sh': case '.msi': case '.app': case '.apk':
             return 'executable';
-        case '.mp4':
-        case '.avi':
-        case '.mkv':
-        case '.mov':
-        case '.wmv':
+        case '.mp4': case '.avi': case '.mkv': case '.mov': case '.wmv':
         default:
             return 'file';
     }

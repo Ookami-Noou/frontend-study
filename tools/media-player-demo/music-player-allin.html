@@ -169,6 +169,16 @@
             font-size: 16px;
         }
 
+        .lyric-line.current ruby rt {
+            font-size: 0.9em;
+            color: #0066cc;
+        }
+
+        ruby rt {
+            font-size: 0.8em;
+            color: #444;
+        }
+
         /* 文件夹样式 */
         .dir {
             list-style-type: none;
@@ -335,6 +345,8 @@
         let currentLyricIndex = -1;
         let lyricInterval;
         let statusMarquee = false;
+
+        const rag = /\{(?=[^\/]*\/[^\}]*\})([^\/\}]+)\/([^\/\}]+)\}/g;
 
         document.getElementById('selectFolder').addEventListener('click', async () => {
             try {
@@ -574,7 +586,8 @@
             lyricsData.forEach((lyric, index) => {
                 const lyricLine = document.createElement('div');
                 lyricLine.className = 'lyric-line';
-                lyricLine.textContent = lyric.text;
+                // lyricLine.textContent = lyric.text;
+                lyricLine.innerHTML = lyric.text.replace(rag, '<ruby>$1<rt>$2</rt></ruby>');
                 lyricLine.dataset.index = index;
                 lyricsContainer.appendChild(lyricLine);
             });

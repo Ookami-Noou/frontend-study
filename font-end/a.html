@@ -183,10 +183,54 @@
 
     <br>
 
-    <select>
+    <select multiple>
         <optgroup label="城市">
-            option
+            <option>北京</option>
+            <option>上海</option>
+            <option>广州</option>
+        </optgroup>
+        <optgroup label="lorem">
+            <option>卢本伟</option>
+            <option>飞起来</option>
         </optgroup>
     </select>
+
+    <p>
+        <input name="gender" type="radio" id="male">
+        <label for="male">男</label>
+        <label>
+            <input name="gender" type="radio">女
+        </label>
+    </p>
+
+    <p>
+        请输入你想喜欢的语言：
+        <input type="text" list="lang">
+        <datalist id="lang">
+            <option value="fontend">HTML+CSS+JavaScript</option>
+            <option value="java">Java</option>
+            <option value="cplusplus">C++</option>
+        </datalist>
+    </p>
+
+    <p>
+        <h1>修改信息</h1>
+        <fieldset>
+            <legend>修改密码</legend>
+            <p>
+                密码：
+                <input type="password">
+            </p>
+            <p>
+                新密码：
+                <input type="password">
+            </p>
+            <p>
+                新密码确认：
+                <input type="password">
+            </p>
+        </fieldset>
+
+    </p>
 </body>
 </html>

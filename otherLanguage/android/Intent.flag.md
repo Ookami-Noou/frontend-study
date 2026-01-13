@@ -25,7 +25,7 @@
 
 ### 3. FLAG_ACTIVITY_CLEAR_TOP
 - 如果目标 Activity 已位于任务栈中，则清除其上所有 Activity ，使其成为栈顶
-- 默认销毁目标 Activity 触发重建
+- 默认调用其 onNewIntent() 方法，而不是销毁并重建它
 - 若配合 [FLAG_ACTIVITY_SINGLE_TOP](#3-flag_activity_clear_top)
 
 ### 4. FLAG_ACTIVITY_REORDER_TO_FRONT
