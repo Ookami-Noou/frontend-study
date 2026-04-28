@@ -62,7 +62,7 @@
      |data|日期选择框。|存在|
      |search|搜索框。|存在|
      |range|滑块。|存在|
-     |color|颜色选择框。|
+     |color|颜色选择框。| |
      |number|数字输入框。只能输入数字。|少量|
      |checkbox|多选框| |
      |radio|单选框| |

@@ -219,9 +219,9 @@
     </tr>
     <tr>
         <td>話す</td>
-        <td>は<b style="color:#f80;">な</b>す</td>
+        <td>はな<b style="color:#f80;">す</b></td>
         <td>はなします</td>
-        <td>は<b style="color:#f80;">な</b>さない</td>
+        <td>はな<b style="color:#f80;">さ</b>ない</td>
     </tr>
     <tr>
         <td rowspan="2">二类动词</td>
