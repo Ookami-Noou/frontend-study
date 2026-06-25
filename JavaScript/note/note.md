@@ -524,13 +524,7 @@ graph LR
    A---G---H
    G-.-XE
    A---I
-   H---J
-   H---K
-   H---L
-   H---M
-   H---N
-   H---O
-   H---P
+   H---J & K & L & M & N & O & P
 ```
 
 1. `getElementById`方法定义在了`Document.prototype`上
@@ -571,15 +565,557 @@ graph LR
 
 W3C[参考文档](https://www.w3school.com.cn/jsref/jsref_obj_date.asp)
 
-# 定时器
+***
+
+# DOM基本操作
+
+1. 查看滚动条的滚动距离
+
+   - `window.pageXOffset/pageYOffset`
+      > IE8及以下不兼容
+   - `document.body/documentElement.scrollLeft/scrollTop`
+      > IE8及以下支持。支持较混乱，用时通常取两个值相加，如 `document.body.scrollLeft + document.documentElement.scrollLeft`。特点：其中一个有值，另一个的值一定是`0`
+
+2. 查看可视区窗口的尺寸
+
+   - `window.innerWidth/innerHeight`
+      > IE8及以下不兼容
+   - `document.documentElement.clientWidth/clientHeight`
+      > 标准模式下，任意浏览器都兼容
+   - `document.body.clientWidth/clientHeight`
+      > 适用于怪异模式下的浏览器
+
+3. 查看元素的几何尺寸
+
+   - dom元素.`getBoundingClientRect()`
+      > ES5的新方法
+      > 兼容性良好
+      > 返回元素的属性，包括 left/top/right/bottom/width/height
+      > height/width 在老版本IE中未实现
+      > 返回的结果并不是实时的，是此时状态的快照
+   
+   - `dom.offsetWidth/offsetHeight`
+   
+4. 查看元素的位置
+
+   - `dom.offsetLeft/offsetTop`
+      > 对于无定位父级的元素，返回相对于文档的坐标
+      > 对于有定位父级的元素，返回相对于最近的有定位父级的坐标
+
+5. 获取最近有定位的父级
+
+   - `dom.offsetParent`
+      > 获取最近的有定位的父级。如无，返回 null
+
+6. 让滚动条滚动
+
+   - `window.scroll()/scrollTo()`
+      > 滚动条滚动到**特定位置**
+      > 参数1：滚动条滚动目标位置的x坐标
+      > 参数2：滚动条滚动目标位置的y坐标
+
+   - `window.scrollBy()`
+      > 滚动条滚动**特定距离**
+      > 参数1：滚动条滚动的x坐标距离
+      > 参数2：滚动条滚动的y坐标距离
+
+***
+
+# 脚本化CSS
+
+1. 读写元素CSS属性
+
+   - `dom.style.prop`
+      > 可读可写行间样式，没有兼容性问题。
+      > 遇到保留字属性，前面应加**css**。如 `float --> cssFloat`
+      > 复合属性必须拆解
+      > 组合单词变为**小驼峰**写法
+      > 写入的值必须是**字符串**属性
+
+2. 查询计算样式
+
+   - `window.getComputedStyle(elt, pseudoElt)`
+    
+      | 参数 | 类型 | 说明 |
+      |-----|-------|-----|
+      |`elt`| Dom | 需要查询的元素 |
+      |`pseudoElt`| String | 如果需要查询伪元素的属性，传入伪元素名称 |
+
+      > 获取当前元素的所有CSS显示值
+      > 计算样式只读
+      > 返回的计算样式的值都是绝对值，没有相对单位
+      > IE8及以下不兼容
+
+   - `dom.currentStyle`
+      > 计算样式只读
+      > 返回的计算样式的值不是经过转换的绝对值
+      > IE独有属性
+
+***
+
+# 事件
+
+## 绑定事件
+
+1. `dom.onxxx`
+
+句柄的绑定方式
+
+> 兼容性很好，但是每个元素的每个事件只能绑定一个函数
+> 等同于写在html行间上
+> `this`指向DOM元素自身
+
+```html
+<script>
+   div.onclick = function () {
+      doSomething();
+   }
+</script>
+
+<!-- 等同于 -->
+
+<div onclick="doSomething()"></div>
+```
+
+2. `obj.addEventListener(type, fn, false)`
+
+> 同一个函数绑定多次也只会执行一次
+> `this`指向DOM元素自身
+> IE8及以下不兼容
+
+```javascript
+div.addEventListener("click", function () {
+   doSomething();
+}, false)
+```
+
+3. `dom.attachEvet(type, fn)`
+
+   - `type`: `"on"` + 事件类型
+   - `fn`: 处理函数
+
+> 同一个函数绑定多次能够执行多次
+> `this`指向`window`
+> IE独占
+
+```javascript
+div.attachEvent("onclick", function () {
+   doSomething()
+})
+```
+
+## 解除绑定事件
+
+1. `dom.onclick` 的方式
+
+```javascript
+dom.onclick = null
+```
+
+2. `dom.removeEventListener(type, fn, false)`
+
+> 解除特定事件的指定的绑定函数
+> 匿名函数无法解除绑定
+
+3. `dom.detachEvent(type, fn)`
+
+***
+
+## 事件处理模型
+
+一个对象的一个事件类型只能存在一个事件模型
+
+### 冒泡
+
+**结构上**嵌套关系的元素会存在事件冒泡，子元素的事件会冒泡到父元素（自底向上）
+
+### 捕获
+
+`addEventListener`参数3修改为 `true`即可触发
+
+**结构上**嵌套关系的元素，父元素的事件会被子元素（事件源元素）捕获（自顶向下）
+
+> IE不支持捕获
+> 执行顺序：先捕获后冒泡
+> focus, blur, change, submit, reset, select 等事件不冒泡
+
+### 阻止冒泡
+
+1. `event.stopPropagation()`
+
+事件处理函数中传递一个参数，该参数记录了触发事件时的关键状态信息。在该对象中存在这个函数，可以阻止冒泡行为。
+
+```javascript
+div.addEventListener("click", function (event) {
+   event.stopPropagation()
+}, false);
+```
+
+> IE8及以下不兼容
+
+2. `event.cancelBubble = true`
+
+```javascript
+div.attachEvent("onclick", function (event) {
+   event.cancelBubble = true
+})
+```
+
+> IE独有
+
+### 阻止默认事件
+
+1. `return false`
+
+> 以对象属性的方式注册的事件才会生效
+
+```javascript
+div.oncontextmenu = function () {
+   doSomething()
+   return false;
+}
+```
+
+2. `event.preventDefault()`
+
+> IE8及以下不兼容
+
+```javascript
+div.oncontextmenu = function (event) {
+   event.preventDefault()
+}
+
+dov.addEventListener('click', function (event) {
+   event.preventDefault()
+}, false);
+```
+
+3. `event.returnValue = false`
+
+> 兼容IE8及以下
+
+```javascript
+div.oncontextmenu = function (event) {
+   event.returnValue = false;
+}
+
+dov.addEventListener('click', function (event) {
+   event.returnValue = false;
+}, false);
+```
+
+### 事件源对象
+
+对于非IE浏览器，事件信息会被封装为对象传入到事件的回调函数中。如果是IE，则会被封装到`window.event`中
+
+事件对象中有一个信息用于记录**事件源**（触发事件的元素）
+
+```javascript
+function callback (e) {
+   var event = e || window.event;
+
+   var eventSrc = event.target  // 火狐只有这个
+           || event.srcElement  // IE只有这个
+                                // chrome两个都有
+}
+```
+
+### 事件委托
+
+利用事件冒泡，和事件源对象处理事件
+
+优点：
+
+1. 性能：不需要循环所有的元素绑定事件
+2. 灵活：当有新的子元素时不需要重新绑定事件
+
+示例：
+
+```html
+<body>
+   <ul>
+      <li>1</li>
+      <li>2</li>
+      <li>3</li>
+      <li>4</li>
+      <li>5</li>
+   </ul>
+   <script>
+      // 传统方式
+      var li = document.getElementByTagName("li");
+      for (var i = 0; i < li.length; i++) {
+         li.onclick = function () {
+            console.log(this.innerText)
+         }
+      }
+
+      // 事件委托
+      var ul = document.getElementByTagName("ul")[0];
+      ul.onclick = function (e) {
+         var event = e || window.event
+         var target = event.target || event.srcElement
+         console.log(target.innerText)
+      }
+   </script>
+</body>
+```
+
+## 鼠标事件
+
+ - `click`: = mousedown + mouseup
+ - `mousedown`
+ - `mousemove`
+ - `mouseup`
+ - `contextmenu`: 右键展开菜单事件
+ - `mouseover`
+ - `mouseout`
+ - `mouseenter`: 同 mouseover ，但是不会冒泡
+ - `mouseleave`: 同 mouseout ，但是不会冒泡
+ - `touchstart`: 同 mousedown ，移动端专属
+ - `touchmove`: 同 mousemove ，移动端专属
+ - `touchend`: 同 mouseup ，移动端专属
+
+**获取按键类型**
+
+只能在 `mousedown` 和 `mouseup` 中通过`event.button`属性获取。
+
+| value | key  |
+|:-----:|:----:|
+| 0     | 左键 |
+| 1     | 中键 |
+| 2     | 右键 |
+
+```javascript
+div.onmousedown = function (e) {
+   console.log(e.button)
+}
+```
+
+> DOM3版本规定：`click` 事件只能监听左键，不能监听右键
+
+## 键盘事件
+
+ - `keydown`
+ - `keypress`
+ - `keyup`
+
+**执行顺序**
+
+keydown > keypress > keyup
+
+**keydown和keypress的区别**
+
+- keydown 能够监听到除了 *fn* 以外的所有按键；keypress 只能监听到字符类按键且**能够监听大小写**
+- keypress 能够监听到按键的ASCII码（通过 `event.charCode`属性），可以转换为相应字符
+
+## 文本类操作事件
+
+ - `input`: 输入时触发
+ - `change`: 失焦时，value变化了触发
+ - `focus`: 聚焦时触发
+ - `blur`: 失焦时触发
+
+## 窗体操作类(window)上的事件
+
+ - `scroll`
+ - `load`: 页面的所有内容加载完成时触发，包括 文档解析、资源下载 等
+
+***
+
+# JSON
+
+ - `JSON.parse(obj)`
+ - `JSON.stringify(obj)`
+
+***
+
+# 异步加载JS
+
+1. defer
+
+使js文件异步加载，DOM文档全部**解析**完后才会执行
+
+```html
+<script type="text/javasript" src="xx.js" defer="defer"></script>
+
+<script defer>
+   var a = 0;
+   // ......
+</script>
+```
+
+> 仅IE能用
+
+2. async
+
+异步加载，加载完就执行，且异步执行
+
+async只能加载外部脚本，不能把js写在script标签里
+
+```html
+<script type="text/javasript" src="xx.js" async="async"></script>
+```
+
+> IE8及以下不兼容
+
+3. 动态创建
 
 
+```html
+<script>
+   var script = document.createElement("script")
+   script.type = "text/javascript"
+   script.src  = "xx.js"  // 这句执行完系统就已经开始下载该文件，但永远不会执行。直到 `script` 被插入到文档中
 
+   document.head.appendChild(script);  // 到这句，xx.js 才会被执行
 
+   // 触发 load 事件是即代表js文件已完成下载
+   // IE 在 script标签中没有 load 事件
+   script.onload = function () {
+      doSomething()
+   }
 
+   // IE中，script 标签中存在 readyState 状态码
+   script.onreadystatechange = function () {
+      // 当 readyState 状态码改变时触发
+      if (script.readyState == "complete" || script.readyState == "loaded") {
+         // 此时加载成功
+         doSomething()
+      }
+   }
+</script>
+```
 
+***
 
+# *JS加载*时间线
 
+1. 创建 document 对象，开始解析 web 页面。解析HTML元素和他们的文本内容后添加Element对象和Text节点到文档中。此时 `document.readyState = "loading"`
+2. 遇到外部link的css，创建线程加载并继续解析文档
+3. 遇到script外部js，并没有设置`defer` `async`，浏览器加载并阻塞，等待js加载完成并执行该脚本，然后继续解析文档。
+4. 遇到script外部js，并且设置有`async` `defer`，浏览器创建线程加载，并继续加在文档。对于async属性的脚本，脚本加载完成后立即执行（异步禁止使用 `document.write()`）
+5. 遇到`img`等节点，浏览器先正常解析其DOM结构，然后异步加载src，并继续解析文档
+6. 当文档解析完成，`document.readyState = "interactive"`
+7. 文档解析完成后，所有设置defer的脚本会按顺序执行（与async不同，但同样禁止`document.write()`）
+8. document对象触发 `DOMContentLoaded` 事件，这也标志着程序执行从同步脚本执行阶段转化为事件驱动阶段
+9. 当所有async的脚本加载完成并执行后，img等加载完成后，`document.readyState = "complete"`，window对象触发load事件
+10. 从此，以异步响应方式处理用户输入、网络事件等
 
+***
 
+# 正则表达式 RegExp
 
+匹配特殊字符或有特殊搭配原则的字符的最佳选择
+
+[参考文档](https://www.w3school.com.cn/js/js_regexp.asp)
+
+## 创建方式
+
+1. 字面量
+
+**/** *字符序列规则* **/** *匹配属性*
+
+|匹配属性|作用|
+|:-----:|:---|
+| `i` | 忽略大小写 |
+| `g` | 全局匹配 |
+| `m` | 多行匹配 |
+
+```javascript
+var reg = /abc/;
+
+reg.test("abcd"); // true
+reg.test("abdc"); // false
+```
+
+2. 对象创建
+
+```javascript
+var reg = new RegExp("abc", "igm")
+```
+
+***
+
+```javascript
+var reg1 = /abc/i
+var reg2 = new RegExp(temp)
+
+// 此时 reg1 和 reg2 的格式完全相同，但是两个不同的对象
+// 如 reg1.a = 10 ，此时 reg2.a = undefined
+```
+
+```javascript
+var reg1 = /abc/i
+var reg2 = RegExp(temp)
+
+// 此时 reg1 和 reg2 是两个完全相同的对象
+// 如 reg1.a = 10 ，此时 reg2.a = 10 成立
+```
+
+***
+
+## 用法
+
+- 子表达式
+
+通过括号`()`，将内部内容作为子表达式进行执行，并可以通过 数字转义（`\1` `\2`）将匹配结果提取出来**反向引用**。
+
+如：
+```javascript
+var reg = /(\w)\1\1\1/
+// 匹配四个连续且相同的字母
+
+["aaaa", "bbbb", "CCCC", "aAaA", "abab"].forEach(str => {
+   console.log(reg.test(str))
+}) // true, true, true, false, false
+```
+
+***
+
+## 方法
+
+- `test(str)`
+
+测试 参数str 是否满足当前正则。如果满足，返回 `true`，否则返回`false`
+
+- `exec(str)`
+
+**如果正则表达式为*全局匹配*模式**
+
+执行**一次**匹配，匹配后返回结果并修改 `RegExp.lastIndex` ，下次执行 exec 时从这个 lastIndex 继续匹配，直到完成一轮循环
+
+```javascript
+var reg = /ab/g
+var str = "ababa"
+
+console.log(reg.exec(str), reg.lastIndex); // [ab, index: 0, input: "ababa"], 2
+console.log(reg.exec(str), reg.lastIndex); // [ab, index: 0, input: "ababa"], 2
+console.log(reg.exec(str), reg.lastIndex); // null, 0
+// 完成一轮循环，下次执行重新开始
+console.log(reg.exec(str), reg.lastIndex); // [ab, index: 0, input: "ababa"], 2
+```
+
+**如果正则表达式 *不是* *全局匹配* 模式**
+
+`RegExp.lastIndex` 不会自动移动，每次都在 lastIndex 位置开始检索直到检索完成
+
+**如果携带*子表达式***
+
+在执行结果中，下标自1开始，分别是各子表达式的值。
+
+```javascript
+var reg = /(a)(b)/
+var str = "abab"
+console.log(reg.exec(str)); 
+// 输出结果为如下对象
+output = {
+   0: 'ab', 
+   1: 'a', /* 第一个子表达式 */
+   2: 'b', /* 第二个子表达式 */
+   length: 3,
+   index: 0, 
+   input: 'abab'
+}
+```
+
+***

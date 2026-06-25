@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        li {
+            user-select: none;
+        }
+        body {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        div {
+            width: 200px;
+            height: 200px;
+            background-color: #f8f;
+            position: absolute;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div></div>
+    <input type="text" style="border: #f4f 1px dotted; margin-top: 100px; width: 200px; height: 30px;">
+    <script>
+        function addEvent(dom, type, fn) {
+            var fmtType = String(type);
+            if (fmtType[0] === 'o' && fmtType[1] === 'n') {
+                fmtType = fmtType.substring(2)
+            }
+            if (dom.addEventListener) {
+                dom.addEventListener(fmtType, fn)
+            } else if (dom.attachEvent) {
+                dom.attachEvent("on" + fmtType, function () {
+                    fn.call(dom)
+                })
+            } else {
+                dom["on" + fmtType] = fn
+            }
+        }
+    </script>
+    <script>
+        var div = document.getElementsByTagName("div")[0]
+        var isDraging = false;
+        var relativePos = { x : 0, y : 0 }
+
+        function move(x, y) {
+            div.style.top = (y - relativePos.y) + "px";
+            div.style.left = (x - relativePos.x) + "px";
+        }
+
+        addEvent(div, "mousedown", function (e) {
+            isDraging = true;
+            relativePos = {
+                x : e.offsetX,
+                y : e.offsetY
+            }
+        })
+        addEvent(document, "mouseup", function (e) {
+            isDraging = false;
+        })
+        addEvent(document, "mousemove", function (e) {
+            if (!isDraging) return;
+            var x = e.pageX;
+            var y = e.pageY;
+            move(x, y)
+        })
+    </script>
+
+    <script>
+        var input = document.getElementsByTagName("input")[0];
+        input.oninput = function (e) {
+            console.log('input', this.value, e)
+        }
+        input.onchange = function (e) {
+            console.log('change', this.value, e)
+        }
+        input.onfocus = function (e) {
+            console.log('focus', this.value, e)
+        }
+        input.onblur = function (e) {
+            console.log("blur", this.value, e)
+        }
+    </script>
+
+    <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+    <div style="width: 10000px; height: 1px"></div>
+    <script>
+        window.onscroll = function (e) {
+            console.log('scroll', e)
+        }
+
+        window.onload = function (e) {
+            console.log('load', e)
+        }
+
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        var reg = /-(\w)/g
+        var str = "the-first-name"
+        console.log(1, 
+            str.replace(reg, function (_, $1) {
+                return $1.toUpperCase();
+            })
+        )
+
+        str = "aaaaabbbbbccccdcccccc"
+        reg = /([\d\D])\1+/g
+        console.log(2, 
+            str.replace(reg, "$1")
+        )
+
+        str = "100000000000"
+        reg = /(\d)(?=(\d{3})+$)/g
+        // reg = /(?=(\B)(\d{3})+$)/g
+        console.log(3, 
+            str.replace(reg, "$1,")
+        )
+    </script>
+</body>
+</html>
