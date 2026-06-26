@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="cmn-hans">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MineSweeper</title>
+    <style>
+        body {
+            padding: unset;
+            margin: unset;
+        }
+        .body {
+            --box-size: 20px;
+            --border-width: 2px;
+            width: 100vw;
+            height: 100vh;
+            background-color: #323232;
+            display: flex;
+            position: relative;
+            flex-direction: row;
+        }
+        .start-menu {
+            width: 270px;
+            height: 100%;
+            background-color: #323232a0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 90%;
+            height: 40px;
+            background-color: rgb(180, 180, 180);
+            line-height: 40px;
+            margin-top: 20px;
+            border-radius: 20px;
+            border: 4px #c0c0c0 outset;
+            user-select: none;
+            text-align: center;
+            text-shadow: #323232a0 1px -1px 1px;
+            font-weight: bold;
+        }
+        .btn:focus, .btn:active {
+            border-style: inset;
+        }
+
+        #status-mine::before {
+            content: "雷剩余：";
+        }
+        #status-mine[value^="-"] {
+            color: red;
+        }
+        #status-time::before {
+            content: "用时：";
+        }
+        #status-mine::before,
+        #status-time::before {
+            width: 4.5em;
+            text-align: end;
+            display: inline-block;
+            color: black;
+            font-weight: bold;
+            user-select: none;
+        }
+        #status-mine, #status-time {
+            user-select: none;
+            color: #323232;
+        }
+
+        .game-content {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .status {
+            width: 100%;
+            height: fit-content;
+            padding-top: 10px;
+            padding-bottom: 10px;;
+            background-color: ivory;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-around;
+        }
+
+        .box[data-n="1"] {
+            color: rgb(0,0,255);
+        }
+        .box[data-n="2"] {
+            color: rgb(0,128,0);
+        }
+        .box[data-n="3"] {
+            color: rgb(255,0,0);
+        }
+        .box[data-n="4"] {
+            color: rgb(0,0,128);
+        }
+        .box[data-n="5"] {
+            color: rgb(128,0,0);
+        }
+        .box[data-n="6"] {
+            color: rgb(0,128,128);
+        }
+        .box[data-n="7"] {
+            color: rgb(195, 0, 255);
+        }
+        .box[data-n="8"] {
+            color: rgb(128,128,128);
+        }
+
+        .box {
+            --w: calc(var(--box-size) - var(--border-width) * 2);
+            width: var(--box-size);
+            height: var(--box-size);
+            border: #c0c0c0 var(--border-width) outset;
+            box-sizing: border-box;
+            background-color: #c1c1c1;
+            position: relative;
+            line-height: var(--w);
+            text-align: center;
+            font-weight: bold;
+        }
+        .box:active {
+            border-style: inset;
+        }
+        .box::after {
+            position: absolute;
+            top: calc(var(--border-width) * -1);
+            left: calc(var(--border-width) * -1);
+            width: var(--box-size);
+            height: var(--box-size);
+            text-align: center;
+            line-height: var(--box-size);
+            margin: unset;
+            padding: unset;
+            font-size: var(--w);
+        }
+        .box.marked::after {
+            content: "🚩";
+        }
+        .box.expanded {
+            border-style: inset;
+            background-color: #d0d0d0;
+        }
+        .box.mine::after {
+            content: "💣"
+        }
+        .box.mine.marked {
+            background-color: red;
+        }
+
+        .game-body {
+            width: 80%;
+            height: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+            user-select: none;
+            background-color: #c1c1c1;
+        }
+    </style>
+</head>
+<body>
+    <div class="body">
+        <div class="start-menu">
+            <div class="btn" data-level="0">普通</div>
+            <div class="btn" data-level="1">专家</div>
+            <div class="btn" data-level="2">大师</div>
+            <div class="btn" data-level="3">传奇</div>
+        </div>
+
+        <div class="game-content">
+            <div class="status">
+                <div id="status-mine" class="status-elem" value="-1">-1</div>
+                <div id="status-time" class="status-elem"></div>
+            </div>
+            <div class="game-body"></div>
+        </div>
+    </div>
+    
+    <script>
+        "use strict";
+
+        var boxSize = 20;
+        var body = document.getElementsByClassName("body")[0]
+        var startMenu = document.getElementsByClassName("start-menu")[0]
+        var gameBody = document.getElementsByClassName("game-body")[0]
+        var gameStatus = document.getElementsByClassName("status")[0]
+        var statusMine = document.getElementById("status-mine");
+        var statusTime = document.getElementById("status-time")
+        var config = {
+            mine: 0,
+            width: 0,
+            height: 0
+        };
+        var defaultConfig = {
+            easy: {
+                mine: 9,
+                width: 10,
+                height: 10
+            },
+            normal: {
+                mine: 40,
+                width: 16,
+                height: 16
+            },
+            hard: {
+                mine: 99,
+                width: 30,
+                height: 16
+            },
+            legendary: {
+                mine: 131,
+                width: 30,
+                height: 20
+            }
+        }
+
+        var mineAlloc = false;
+        var map = [];
+        var mineLeft = 0;
+        var gameEnd = false;
+        var timer = void 0;
+
+        Array.prototype.count = function (fn) {
+            var count = 0; 
+            for (var i = 0; i < this.length; i++) {
+                if (fn(this[i])) count++;
+            }
+            return count;
+        }
+        function Box(index) {
+            if (!new.target) {
+                throw new Error("current functon Box must called by new")
+            }
+            this.index = index;
+            this.expanded = false;
+            this.isMine = false;
+            this.marked = false;
+            this.number = 0;
+        }
+        Box.prototype.expand = function () {
+            var {width, height} = config;
+            if (this.expanded) {
+                // 如果已经展开，则判断能否将周围全部展开或全部标记
+                // 已展开说明至少雷已经分配。直接计算
+
+                if (this.number == 0) {
+                    // 如果是 0，则一定已经全部展开
+                    return;
+                }
+                var roundBoxes = this.getRoundBoxes()
+                var expandedCount = roundBoxes.count(elem => elem.expanded)
+                var markedCount = roundBoxes.count(elem => elem.marked)
+                var notExpandedCount = roundBoxes.length - expandedCount;
+                if (notExpandedCount == 0 || markedCount == notExpandedCount) {
+                    // 已全部展开或者已标记格子等于未展开格子。结束
+                    return;
+                }
+                if (markedCount == this.number) {
+                    // 已经标记足够的数量，则展开剩余内容
+                    roundBoxes.forEach(elem => {
+                        if (!elem.marked && !elem.expanded) {
+                            elem.expand();
+                        }
+                    })
+                } else if (notExpandedCount == this.number) {
+                    // 如果未展开数量恰好等于周围雷的数量，则标记所有格子
+                    roundBoxes.forEach(elem => {
+                        if (!elem.marked && !elem.expanded) {
+                            elem.toggleMask();
+                        }
+                    })
+                }
+
+            } else if (this.marked) {
+                // 已标记的不允许展开。
+                return;
+            } else {
+                // 如果没有展开，则展开；
+                this.expanded = true
+                if (this.isMine) {
+                    // 如果是雷，展开所有雷并结束游戏
+                    map.forEach(box => {
+                        if (box.isMine) {
+                            gameBody.children[box.index].classList.add("mine")
+                        }
+                    })
+                    gameFailed();
+                    return;
+                } else {
+                    // 如果不是雷，则展开这一个
+                    if(!mineAlloc) {
+                        // 如果未分配雷，则分配
+                        mallocMine(this.index)
+                    }
+                    var roundBoxes = this.getRoundBoxes()
+                    gameBody.children[this.index].classList.add("expanded")
+                    gameBody.children[this.index].dataset.n = this.number
+                    if (this.number != 0) {
+                        // 0不显示数字
+                        gameBody.children[this.index].innerHTML = this.number
+                    } else {
+                        // 如果是0，展开周围8个格子
+                        setTimeout(() => {
+                            roundBoxes.forEach(elem => {
+                                if (elem.number == 0 && elem.marked) {
+                                    elem.toggleMask()
+                                }
+                                !elem.expanded && elem.expand()
+                            })
+                        }, 80)
+                    }
+                }
+            }
+            checkSuccess()
+        }
+        Box.prototype.toggleMask = function () {
+            if (this.expanded) return;
+            this.marked = !this.marked;
+            var dom = gameBody.children[this.index]
+            if (this.marked) {
+                dom.classList.add("marked")
+                mineLeft--;
+            } else {
+                dom.classList.remove("marked")
+                mineLeft++;
+            }
+            setUiLeftMine();
+        }
+        Box.prototype.getRoundBoxes = function () {
+            var i = this.index
+            var w = config.width
+            var idxes = []
+            var hasLeft = (this.index % w) != 0
+            var hasRight = (this.index + 1) % w != 0
+            var idxes = [i - w, i + w];
+            if (hasLeft) {
+                idxes.push(i - w - 1, i - 1, i + w - 1)
+            }
+            if (hasRight) {
+                idxes.push(i - w + 1, i + 1, i + w + 1)
+            }
+            var maxVal = config.height * w;
+            return idxes.filter(idx => idx >= 0 && idx < maxVal).map(idx => map[idx])
+        }
+        Box.prototype.calcNumber = function () {
+            var roundBoxes = this.getRoundBoxes()
+            this.number = roundBoxes.filter(elem => elem.isMine).length
+        }
+
+
+        body.addEventListener('click', function (e) {
+            e.stopPropagation();
+        })
+        gameBody.addEventListener('contextmenu', function (e) {
+            e.preventDefault();
+        })
+        startMenu.addEventListener('click', function (e) {
+            var level = e.target.dataset.level
+            if (!level) return;
+            switch (level) {
+                case "0":
+                    config = defaultConfig.easy
+                    break;
+                case "1":
+                    config = defaultConfig.normal
+                    break;
+                case "2":
+                    config = defaultConfig.hard
+                    break;
+                case "3":
+                    config = defaultConfig.legendary
+                    break;
+                default:
+                    return;
+            }
+            gameBody.style.width = (config.width * boxSize) + "px";
+            gameBody.style.height = (config.height * boxSize) + "px"
+            startGame();
+        })
+
+        function checkSuccess() {
+            if (canGameSuccess()) {
+                gameSuccess();
+            }
+        }
+        function canGameSuccess() {
+            return map.count(elem => !elem.expanded) == config.mine;
+        }
+        function startGame() {
+            console.log("start game")
+            mineAlloc = false;
+            gameEnd = false;
+            map = []
+            gameBody.innerHTML = '';
+            var fragment = document.createDocumentFragment();
+            for (var i = 0; i < config.height * config.width; i++) {
+                map.push(new Box(i))
+                var div = document.createElement("div")
+                div.classList.add("box")
+                div.dataset.i = i;
+                fragment.appendChild(div)
+            }
+            mineLeft = config.mine;
+            gameBody.appendChild(fragment)
+            setUiLeftMine();
+            gameBody.addEventListener('mousedown', gameBoxHandler)
+            statusTime.innerText = ''
+            startTimer()
+        }
+        function gameFailed() {
+            if (gameEnd) return;
+            console.log("game failed")
+            stopTimer();
+            gameEnd = true;
+            gameBody.removeEventListener('mousedown', gameBoxHandler)
+        }
+        function gameSuccess() {
+            if (gameEnd) return;
+            console.log("game success")
+            stopTimer();
+            gameEnd = true;
+            gameBody.removeEventListener('mousedown', gameBoxHandler)
+            // TODO 成功后展示
+            setTimeout(() => {
+                alert("恭喜通关")
+            }, 1000 / 30 * 2)
+        }
+
+        function gameBoxHandler(e) {
+            var target = e.target.closest("[data-i]");
+            if (!target) return;
+            var idx = target.dataset.i;
+            var box = map[idx];
+            if (e.button == 0) {// 左键
+                box.expand();
+            } else if (e.button == 2) {
+                box.toggleMask();
+            }
+        }
+        function mallocMine(index) {
+            mineAlloc = true;
+            var mines = generateUniqueIntegers(0, map.length - 1, config.mine, index)
+            mines.forEach(idx => {
+                map[idx] && (map[idx].isMine = true)
+            })
+            map.forEach(elem => elem.calcNumber())
+        }
+
+        function setUiLeftMine() {
+            statusMine.setAttribute("value", mineLeft);
+            statusMine.innerText = mineLeft;
+        }
+
+        function generateUniqueIntegers(min, max, count, exclude) {
+            // 边界计算
+            var total = max - min + 1;
+            var hasExclude = exclude >= min && exclude <= max;
+            var available = total - (hasExclude ? 1 : 0);
+
+            if (count > available) {
+                throw new Error(`范围 [${min}, ${max}] 内仅 ${available} 个可用数字（排除 ${exclude} 后），无法生成 ${count} 个。`);
+            }
+            var arr = [];
+            for (var i = min; i <= max; i++) {
+                if (i !== exclude) arr.push(i);
+            }
+            // Fisher-Yates 洗牌
+            for (var i = arr.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr.slice(0, count);
+        }
+
+        var timeUsed = 0;
+        function startTimer() {
+            stopTimer()
+            timer = setInterval(() => {
+                statusTime.innerText = formatTime(++timeUsed);
+            }, 1000)
+        }
+        function stopTimer() {
+            clearInterval(timer);
+            timeUsed = 0;
+        }
+        function formatTime(time) {
+            return Math.floor(time / 60).toString().padStart(2, '0') + ":" + (time % 60).toString().padStart(2, '0')
+        }
+    </script>
+</body>
+</html>
