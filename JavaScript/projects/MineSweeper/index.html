@@ -152,7 +152,12 @@
             content: "💣"
         }
         .box.mine.marked {
+            background-color: greenyellow;
+            border-color: greenyellow;
+        }
+        .box.mine.boom {
             background-color: red;
+            border-color: red;
         }
 
         .game-body {
@@ -289,6 +294,7 @@
                 this.expanded = true
                 if (this.isMine) {
                     // 如果是雷，展开所有雷并结束游戏
+                    gameBody.children[this.index].classList.add("boom")
                     map.forEach(box => {
                         if (box.isMine) {
                             gameBody.children[box.index].classList.add("mine")
